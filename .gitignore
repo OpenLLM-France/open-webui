@@ -8,6 +8,10 @@ node_modules
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# postgres data
+litellm/postgres/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -15,7 +15,7 @@ services:
     ports:
       - "4040:4000"
     volumes:
-      - ./litellm-config.yaml:/app/config.yaml
+      - ./litellm/litellm-config.yaml:/app/config.yaml
     env_file:
       - .env
     command: >
@@ -35,7 +35,7 @@ services:
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: keys_db
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - ./litellm/postgres_data:/var/lib/postgresql/data
     restart: always
 
 volumes:

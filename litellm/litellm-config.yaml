@@ -1,0 +1,37 @@
+model_list:
+  - model_name: Lucie_7B
+    litellm_params:
+      model: openai/lucie-7b
+      api_base: os.environ/BASE_URL
+      api_key: os.environ/LUCIE_API_KEY
+      max_tokens: 1000
+      input_cost_per_token: 0.000003
+      output_cost_per_token: 0.000015
+  
+  - model_name: Meta_Llama_31_8b_it
+    litellm_params:
+      model: openai/meta-llama-31-8b-it
+      api_base: os.environ/BASE_URL
+      api_key: os.environ/LLAMA31_API_KEY
+      max_tokens: 1000
+      input_cost_per_token: 0.001
+      output_cost_per_token: 0.001
+
+general_settings: 
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: postgresql://admin:secret@postgres:5432/keys_db
+  # enforce_user_param: True
+
+
+# postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
+
+
+# litellm_settings:
+#   # Logging/Callback settings
+#   success_callback: ["langfuse"]  # list of success callbacks
+#   request_timeout: 60 # (int) llm requesttimeout in seconds. Raise Timeout error if call takes longer than 10s. Sets litellm.request_timeout 
+
+#   cache: true 
+#   cache_params:        # set cache params for redis
+#     type: redis
+#     ttl: 600 # will be cached on redis for 600s

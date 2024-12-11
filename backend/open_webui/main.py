@@ -58,6 +58,9 @@ from open_webui.apps.socket.main import (
     get_event_call,
     get_event_emitter,
 )
+
+from open_webui.apps.stripe.main import app as stripe_app
+
 from open_webui.apps.webui.internal.db import Session
 from open_webui.apps.webui.main import (
     app as webui_app,
@@ -1037,6 +1040,8 @@ async def inspect_websocket(request: Request, call_next):
 app.mount("/ws", socket_app)
 app.mount("/ollama", ollama_app)
 app.mount("/openai", openai_app)
+
+app.mount("/stripe", stripe_app)
 
 app.mount("/images/api/v1", images_app)
 app.mount("/audio/api/v1", audio_app)

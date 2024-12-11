@@ -10,5 +10,33 @@ services:
     ports:
       - "8000:8080" # Adjust this if your app exposes a different port
 
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    ports:
+      - "4040:4000"
+    volumes:
+      - ./litellm-config.yaml:/app/config.yaml
+    env_file:
+      - .env
+    command: >
+      --config /app/config.yaml
+      --port 4000
+      --num_workers 8
+      --detailed_debug
+    
+    depends_on:
+      - postgres  # Ensure the PostgreSQL service is started before litellm
+
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: keys_db
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    restart: always
+
 volumes:
   open-webui:

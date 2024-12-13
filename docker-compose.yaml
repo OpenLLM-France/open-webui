@@ -1,5 +1,8 @@
+include :
+  - authentik/docker-compose.yaml
 services:
   webui:
+    container_name: webui-dev
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,10 +12,14 @@ services:
       - open-webui1:/app/backend/data
       - ./backend/open_webui:/app/backend/open_webui
     ports:
-      - "8080:8080" # Adjust this if your app exposes a different port
+      - "8000:8080" # Adjust this if your app exposes a different port
+    depends_on:
+      server : 
+        condition: service_healthy
 
   litellm:
     image: ghcr.io/berriai/litellm:main-latest
+    container_name: litellm-dev
     ports:
       - "4000:4000"
     volumes:
@@ -30,6 +37,7 @@ services:
 
 
   postgres:
+    container_name: postgres-dev
     image: postgres:latest
     environment:
       POSTGRES_USER: admin

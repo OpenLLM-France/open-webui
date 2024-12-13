@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import Navbar from '$lib/components/layout/Navbar.svelte';
-	import Sidebar from '$lib/components/common/Sidebar.svelte';
+	// Imports
+	import { onMount, getContext } from 'svelte';
 
 	let stripeScriptLoaded = false;
+
+	const i18n = getContext('i18n'); // Translations
 
 	// Dynamically load Stripe script
 	onMount(() => {
@@ -19,20 +20,14 @@
 	});
 </script>
 
-<svelte:head>
-	<title>Choose Your Plan | YourSiteName</title>
-</svelte:head>
-
 {#if stripeScriptLoaded}
 	<!-- Ensure Stripe script is loaded before rendering -->
-	<div
-		class="flex flex-col w-full h-screen max-h-[100dvh] md:max-w-[calc(100%-260px)] bg-white dark:bg-gray-900"
-	>
+	<div class="flex flex-col h-screen max-h-[100dvh]">
 		<div class="flex flex-col flex-auto justify-center py-8">
 			<div class="px-3 w-full max-w-5xl mx-auto">
 				<!-- Title and description -->
-				<div class="text-3xl font-semibold line-clamp-1">Choose Your Plan</div>
-				<div class="mt-1 text-gray-400">Pick a subscription plan below:</div>
+				<div class="text-3xl font-semibold line-clamp-1">{$i18n.t('Choose your plan')}</div>
+				<div class="mt-1 text-gray-400">{$i18n.t('Pick a subscription plan below :')}</div>
 
 				<hr class="border-gray-50 dark:border-gray-850 mt-6 mb-2" />
 			</div>

@@ -3,6 +3,7 @@
 	import { getContext } from 'svelte';
 	import CircularProgressBar from '$lib/components/common/CircularProgressBar.svelte';
 	import Coins from '$lib/components/icons/Coins.svelte';
+	import AreaLineChart from '$lib/components/common/AreaLineChart.svelte';
 
 	const i18n = getContext('i18n'); // Translations
 
@@ -16,7 +17,7 @@
 	<h1 class="pb-12 text-4xl font-bold">{$i18n.t('API Usage')}</h1>
 	<div class="md:flex md:space-x-12 max-md:space-y-12">
 		<div
-			class="bg-gray-50 dark:bg-gray-950 lg:w-72 h-96 rounded-3xl flex flex-col items-center p-6"
+			class="bg-gray-50 dark:bg-gray-950 lg:w-72 md:h-96 rounded-3xl flex flex-col items-center p-6"
 		>
 			<!-- Tokens left -->
 			<h2 class="font-semibold">{$i18n.t('Tokens left')}</h2>
@@ -42,6 +43,22 @@
 		</div>
 
 		<!-- Tokens spent -->
-		<div class="bg bg-gray-50 dark:bg-gray-950 grow h-96 rounded-3xl"></div>
+		<div
+			class="bg-gray-50 dark:bg-gray-950 grow md:h-96 rounded-3xl flex flex-col items-center p-6"
+		>
+			<h2 class="font-semibold">{$i18n.t('Tokens spent')}</h2>
+			<span class="text-xs">Dec. 10 - Dec. 15</span>
+
+			<div class="w-full h-full p-6 relative flex flex-col items-center">
+				<AreaLineChart />
+				<div class="flex text-xs items-center space-x-2">
+					<div class="rounded-full h-2 aspect-square bg-[#FF000055]"></div>
+					<span>Prompt tokens</span>
+					<div class="w-8" />
+					<div class="rounded-full h-2 aspect-square bg-[#0000FF55]"></div>
+					<span>Response tokens</span>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>

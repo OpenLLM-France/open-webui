@@ -10,7 +10,6 @@ from sqlalchemy import BigInteger, Column, String, Text
 # User DB Schema
 ####################
 
-
 class User(Base):
     __tablename__ = "user"
 
@@ -29,6 +28,7 @@ class User(Base):
     info = Column(JSONField, nullable=True)
 
     oauth_sub = Column(Text, unique=True)
+    llm_api_key = Column(String, nullable=True) # litellm api key: TODO: Get rid of the default value
 
 
 class UserSettings(BaseModel):
@@ -55,6 +55,7 @@ class UserModel(BaseModel):
     oauth_sub: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
+    llm_api_key: Optional[str] = None
 
 
 ####################
@@ -91,6 +92,7 @@ class UsersTable:
         profile_image_url: str = "/user.png",
         role: str = "pending",
         oauth_sub: Optional[str] = None,
+        llm_api_key: Optional[str] = None
     ) -> Optional[UserModel]:
         with get_db() as db:
             user = UserModel(
@@ -104,6 +106,7 @@ class UsersTable:
                     "created_at": int(time.time()),
                     "updated_at": int(time.time()),
                     "oauth_sub": oauth_sub,
+                    'llm_api_key': llm_api_key
                 }
             )
             result = User(**user.model_dump())

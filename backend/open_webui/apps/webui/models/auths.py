@@ -7,7 +7,7 @@ from open_webui.apps.webui.models.users import UserModel, Users
 from open_webui.env import SRC_LOG_LEVELS
 from pydantic import BaseModel
 from sqlalchemy import Boolean, Column, String, Text
-from open_webui.utils.utils import verify_password
+from open_webui.utils.utils import verify_password, generate_llm_api_key
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["MODELS"])
@@ -115,8 +115,9 @@ class AuthsTable:
             result = Auth(**auth.model_dump())
             db.add(result)
 
+            user_llm_api_key = generate_llm_api_key(email=email, user_name=name)
             user = Users.insert_new_user(
-                id, name, email, profile_image_url, role, oauth_sub
+                id, name, email, profile_image_url, role, oauth_sub, llm_api_key=user_llm_api_key
             )
 
             db.commit()

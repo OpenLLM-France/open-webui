@@ -395,3 +395,9 @@ else:
 ####################################
 
 OFFLINE_MODE = os.environ.get("OFFLINE_MODE", "false").lower() == "true"
+
+####################################
+# LiteLLM
+####################################
+LITELLM_MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY", "")
+LITELLM_HOST = os.environ.get("LITELLM_HOST", "http://litellm:4000")

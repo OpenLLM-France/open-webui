@@ -613,7 +613,9 @@ class ChatCompletionMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
         log.debug(f"request.url.path: {request.url.path}")
 
-        model_list = await get_all_models()
+        user = get_current_user(request, get_http_authorization_cred(request.headers.get("Authorization")))
+        model_list = await get_all_models(user=user)
+
         models = {model["id"]: model for model in model_list}
 
         try:
@@ -919,8 +921,8 @@ class PipelineMiddleware(BaseHTTPMiddleware):
                 status_code=e.status_code,
                 content={"detail": e.detail},
             )
-
-        model_list = await get_all_models()
+    
+        model_list = await get_all_models(user)
         models = {model["id"]: model for model in model_list}
 
         try:
@@ -1052,13 +1054,13 @@ app.mount("/api/v1", webui_app)
 webui_app.state.EMBEDDING_FUNCTION = retrieval_app.state.EMBEDDING_FUNCTION
 
 
-async def get_all_base_models():
+async def get_all_base_models(user=None):
     open_webui_models = []
     openai_models = []
     ollama_models = []
 
     if app.state.config.ENABLE_OPENAI_API:
-        openai_models = await get_openai_models()
+        openai_models = await get_openai_models(user)
         openai_models = openai_models["data"]
 
     if app.state.config.ENABLE_OLLAMA_API:
@@ -1082,8 +1084,8 @@ async def get_all_base_models():
 
 
 @cached(ttl=3)
-async def get_all_models():
-    models = await get_all_base_models()
+async def get_all_models(user=None):
+    models = await get_all_base_models(user)
 
     # If there are no models, return an empty list
     if len([model for model in models if not model.get("arena", False)]) == 0:
@@ -1212,7 +1214,7 @@ async def get_all_models():
 
 @app.get("/api/models")
 async def get_models(user=Depends(get_verified_user)):
-    models = await get_all_models()
+    models = await get_all_models(user)
 
     # Filter out filter pipelines
     models = [
@@ -1261,7 +1263,7 @@ async def get_models(user=Depends(get_verified_user)):
 
 @app.get("/api/models/base")
 async def get_base_models(user=Depends(get_admin_user)):
-    models = await get_all_base_models()
+    models = await get_all_base_models(user)
 
     # Filter out arena models
     models = [model for model in models if not model.get("arena", False)]
@@ -1272,7 +1274,7 @@ async def get_base_models(user=Depends(get_admin_user)):
 async def generate_chat_completions(
     form_data: dict, user=Depends(get_verified_user), bypass_filter: bool = False
 ):
-    model_list = await get_all_models()
+    model_list = await get_all_models(user)
     models = {model["id"]: model for model in model_list}
 
     model_id = form_data["model"]
@@ -1322,7 +1324,7 @@ async def generate_chat_completions(
         if model_ids and filter_mode == "exclude":
             model_ids = [
                 model["id"]
-                for model in await get_all_models()
+                for model in await get_all_models(user)
                 if model.get("owned_by") != "arena" and model["id"] not in model_ids
             ]
 
@@ -1332,7 +1334,7 @@ async def generate_chat_completions(
         else:
             model_ids = [
                 model["id"]
-                for model in await get_all_models()
+                for model in await get_all_models(user)
                 if model.get("owned_by") != "arena"
             ]
             selected_model_id = random.choice(model_ids)
@@ -1388,7 +1390,7 @@ async def generate_chat_completions(
 
 @app.post("/api/chat/completed")
 async def chat_completed(form_data: dict, user=Depends(get_verified_user)):
-    model_list = await get_all_models()
+    model_list = await get_all_models(user)
     models = {model["id"]: model for model in model_list}
 
     data = form_data
@@ -1575,7 +1577,7 @@ async def chat_action(action_id: str, form_data: dict, user=Depends(get_verified
             detail="Action not found",
         )
 
-    model_list = await get_all_models()
+    model_list = await get_all_models(user)
     models = {model["id"]: model for model in model_list}
 
     data = form_data
@@ -1761,7 +1763,7 @@ async def update_task_config(form_data: TaskConfigForm, user=Depends(get_admin_u
 @app.post("/api/task/title/completions")
 async def generate_title(form_data: dict, user=Depends(get_verified_user)):
 
-    model_list = await get_all_models()
+    model_list = await get_all_models(user)
     models = {model["id"]: model for model in model_list}
 
     model_id = form_data["model"]
@@ -1857,7 +1859,7 @@ async def generate_chat_tags(form_data: dict, user=Depends(get_verified_user)):
             content={"detail": "Tags generation is disabled"},
         )
 
-    model_list = await get_all_models()
+    model_list = await get_all_models(user)
     models = {model["id"]: model for model in model_list}
 
     model_id = form_data["model"]
@@ -1953,7 +1955,7 @@ async def generate_queries(form_data: dict, user=Depends(get_verified_user)):
                 detail=f"Query generation is disabled",
             )
 
-    model_list = await get_all_models()
+    model_list = await get_all_models(user)
     models = {model["id"]: model for model in model_list}
 
     model_id = form_data["model"]
@@ -2035,7 +2037,7 @@ async def generate_autocompletion(form_data: dict, user=Depends(get_verified_use
                 detail=f"Input prompt exceeds maximum length of {app.state.config.AUTOCOMPLETE_GENERATION_INPUT_MAX_LENGTH}",
             )
 
-    model_list = await get_all_models()
+    model_list = await get_all_models(user)
     models = {model["id"]: model for model in model_list}
 
     model_id = form_data["model"]
@@ -2103,7 +2105,7 @@ async def generate_autocompletion(form_data: dict, user=Depends(get_verified_use
 @app.post("/api/task/emoji/completions")
 async def generate_emoji(form_data: dict, user=Depends(get_verified_user)):
 
-    model_list = await get_all_models()
+    model_list = await get_all_models(user)
     models = {model["id"]: model for model in model_list}
 
     model_id = form_data["model"]
@@ -2176,7 +2178,7 @@ Message: """{{prompt}}"""
 @app.post("/api/task/moa/completions")
 async def generate_moa_response(form_data: dict, user=Depends(get_verified_user)):
 
-    model_list = await get_all_models()
+    model_list = await get_all_models(user)
     models = {model["id"]: model for model in model_list}
 
     model_id = form_data["model"]
@@ -2251,7 +2253,7 @@ Responses from models: {{responses}}"""
 
 @app.get("/api/pipelines/list")
 async def get_pipelines_list(user=Depends(get_admin_user)):
-    responses = await get_openai_models_responses()
+    responses = await get_openai_models_responses(user)
 
     log.debug(f"get_pipelines_list: get_openai_models_responses returned {responses}")
     urlIdxs = [

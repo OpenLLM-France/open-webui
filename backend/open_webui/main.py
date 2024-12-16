@@ -2658,7 +2658,7 @@ async def get_app_config(request: Request):
 
 
 @app.get("/api/webhook")
-async def get_webhook_url(user=Depends(get_admin_user)):
+async def get_webhook_url(user=Depends(get_verified_user)):
     return {
         "url": app.state.config.WEBHOOK_URL,
     }
@@ -2669,7 +2669,7 @@ class UrlForm(BaseModel):
 
 
 @app.post("/api/webhook")
-async def update_webhook_url(form_data: UrlForm, user=Depends(get_admin_user)):
+async def update_webhook_url(form_data: UrlForm, user=Depends(get_verified_user)):
     app.state.config.WEBHOOK_URL = form_data.url
     webui_app.state.WEBHOOK_URL = app.state.config.WEBHOOK_URL
     return {"url": app.state.config.WEBHOOK_URL}

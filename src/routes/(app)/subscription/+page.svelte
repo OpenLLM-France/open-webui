@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import Navbar from '$lib/components/layout/Navbar.svelte';
 	import Sidebar from '$lib/components/common/Sidebar.svelte';
+	import {user} from '$lib/stores';
+
 
 	let stripeScriptLoaded = false;
 
@@ -17,6 +19,9 @@
 			};
 		}
 	});
+	
+	let CLIENT_EMAIL = $user.email;
+	console.log(CLIENT_EMAIL)
 </script>
 
 <svelte:head>
@@ -43,6 +48,7 @@
 					<stripe-pricing-table
 						pricing-table-id="prctbl_1QU8xSL1OXPRbGUfSQZGLM3f"
 						publishable-key="pk_test_51QU8iOL1OXPRbGUft8UIzp0IDHKaxLtIpkBYrJG6P4ZaJiomiasrHCIiJuzrnm9r6kihaZ2Iq1k7n5hFS7ILztEk00BrqagIRt"
+						customer-email={CLIENT_EMAIL}
 					>
 					</stripe-pricing-table>
 				</div>

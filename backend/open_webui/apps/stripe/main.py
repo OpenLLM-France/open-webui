@@ -4,10 +4,10 @@ from fastapi.responses import FileResponse, StreamingResponse
 import stripe
 import logging
 import requests
-from open_webui.apps.webui.models.users import UserModel
+from open_webui.apps.webui.models.users import UserModel, Users
 from open_webui.utils.utils import get_current_user, get_http_authorization_cred
 
-from .utils import get_user_max_budget, update_user_max_budget
+from .utils import get_user_max_budget, update_user_max_budget, get_subscription_info
 
 from open_webui.config import (
     CORS_ALLOW_ORIGIN,
@@ -29,7 +29,6 @@ app = FastAPI(
     redoc_url=None,
 )
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ALLOW_ORIGIN,
@@ -37,6 +36,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/subscription_info")
+async def get_subs_info(user: UserModel=Depends(get_current_user)):
+    spend, budget, budget_dration = get_subscription_info(key=user.llm_api_key)
+    return {
+        "spend": spend,
+        "budget": budget,
+        'budget_dration': budget_dration
+    }
+
 
 @app.post("/webhook")
 async def stripe_webhook(request: Request, stripe_signature: str = Header(None)):
@@ -48,32 +58,38 @@ async def stripe_webhook(request: Request, stripe_signature: str = Header(None))
         payload = await request.body()
         sig_header = stripe_signature
 
+        log.info(f"Payload : {payload}")
+        log.info(f"WH secret : {STRIPE_WEBHOOK_SECRET}")
         # Verify the event by using the Stripe SDK
         event = stripe.Webhook.construct_event(
             payload, sig_header, STRIPE_WEBHOOK_SECRET
         )
-
-        user = get_current_user(request, get_http_authorization_cred(request.headers.get("Authorization")))
-
+        
+        # user = get_current_user(request, get_http_authorization_cred(request.headers.get("Authorization")))
+        log.info(f"Event: {request}")
         # Handle the event (depending on its type)
-        if event["type"] == "payment_intent.succeeded":
+        if event["type"] == "invoice.payment_succeeded":
             payment_intent = event["data"]["object"]
-            print(f"Payment for {payment_intent['amount']} succeeded!")
+            log.info(f"Payment for {payment_intent['amount_paid']} succeeded!")
             # Perform actions like updating a database, sending an email, etc.
             # Add budget to litellm
+            email = payment_intent['customer_email']
+            user = Users.get_user_by_email(email)
+            log.info(f"api_key: {user.llm_api_key}")
+
             user_key = user.llm_api_key
             current_budget = get_user_max_budget(user_key)
-            print("CURRENT BUDGET: ", current_budget)
-            new_budget = current_budget + payment_intent["amount"]/100
+            log.info("CURRENT BUDGET: ", current_budget)
+            new_budget = current_budget + payment_intent["amount_paid"]/100
             update_user_max_budget(user_key, new_budget)
 
         elif event["type"] == "invoice.payment_failed":
             invoice = event["data"]["object"]
-            print(f"Payment for Invoice {invoice['id']} failed.")
+            log.error(f"Payment for Invoice {invoice['id']} failed.")
             # Handle failed payments
 
         else:
-            print(f"Unhandled event type: {event['type']}")
+            log.error(f"Unhandled event type: {event['type']}")
 
         # Return a 200 response to acknowledge receipt of the event
         return {"status": "success"}

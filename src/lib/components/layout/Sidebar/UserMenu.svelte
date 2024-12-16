@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Imports
 	import { DropdownMenu } from 'bits-ui';
 	import { createEventDispatcher, getContext, onMount } from 'svelte';
 
@@ -9,8 +10,10 @@
 	import { fade, slide } from 'svelte/transition';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import { userSignOut } from '$lib/apis/auths';
+	import Monitoring from '$lib/components/icons/Monitoring.svelte';
+	import Dollar from '$lib/components/icons/Dollar.svelte';
 
-	const i18n = getContext('i18n');
+	const i18n = getContext('i18n'); // Translations
 
 	export let show = false;
 	export let role = '';
@@ -72,6 +75,7 @@
 				<div class=" self-center truncate">{$i18n.t('Settings')}</div>
 			</button>
 
+			<!-- Subscription -->
 			<a
 				class="flex rounded-md py-2 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition"
 				href="/subscription"
@@ -84,22 +88,27 @@
 				}}
 			>
 				<div class="self-center mr-3">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke-width="1.5"
-						stroke="currentColor"
-						class="w-5 h-5"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M12 2.25C6.99 2.25 3 6.24 3 10.5S6.99 18.75 12 18.75 21 14.76 21 10.5 17.01 2.25 12 2.25zm0 13.5c-1.5 0-3-1.5-3-3s1.5-3 3-3 3 1.5 3 3-1.5 3-3 3zm0-9c-.414 0-.75-.336-.75-.75S11.586 5 12 5s.75.336.75.75-.336.75-.75.75z"
-						/>
-					</svg>
+					<Dollar />
 				</div>
 				<div class=" self-center truncate">{$i18n.t('Subscription')}</div>
+			</a>
+
+			<!-- API Usage -->
+			<a
+				class="flex rounded-md py-2 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+				href="/api-usage"
+				on:click={() => {
+					show = false;
+
+					if ($mobile) {
+						showSidebar.set(false);
+					}
+				}}
+			>
+				<div class="self-center mr-3">
+					<Monitoring />
+				</div>
+				<div class=" self-center truncate">{$i18n.t('API Usage')}</div>
 			</a>
 
 			<button

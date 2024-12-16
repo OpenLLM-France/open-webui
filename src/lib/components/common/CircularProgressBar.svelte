@@ -3,7 +3,7 @@
 	import { Doughnut } from 'svelte-chartjs';
 	import { Chart as ChartJS, ArcElement, CategoryScale } from 'chart.js';
 
-	export let progress = 0; // How much should the progress bar be filled (%)
+	export let progress: number = 0; // How much should the progress bar be filled (%)
 
 	// Set up data
 	const data = {
@@ -26,6 +26,7 @@
 		cutout: 90
 	};
 
+	// Set up chart
 	ChartJS.register(ArcElement, CategoryScale);
 </script>
 

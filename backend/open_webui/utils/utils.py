@@ -8,14 +8,16 @@ from typing import Optional, Union, List, Dict
 from open_webui.apps.webui.models.users import Users
 
 from open_webui.constants import ERROR_MESSAGES
-from open_webui.env import WEBUI_SECRET_KEY, LITELLM_HOST, LITELLM_MASTER_KEY
+from open_webui.env import SRC_LOG_LEVELS, WEBUI_SECRET_KEY, LITELLM_HOST, LITELLM_MASTER_KEY
 
 from fastapi import Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from passlib.context import CryptContext
 import requests
 
-logging.getLogger("passlib").setLevel(logging.ERROR)
+
+log = logging.getLogger(__name__)
+log.setLevel(SRC_LOG_LEVELS["MODELS"])
 
 
 SESSION_SECRET = WEBUI_SECRET_KEY
@@ -61,6 +63,8 @@ def generate_llm_api_key(email, user_name):
         "metadata": {"user": f"{user_name}"},
         'max_budget': 10,
         'budget_duration': '1h',
+        'key_alias': f"{user_name}",
+
         'metadata': {"team": "AiTeam", "user":user_name, "email": email}
         # "models": ["gpt-3.5-turbo", "gpt-4"], all models will be exposed. TODO: Eventually, we can set it up
     }
@@ -71,8 +75,8 @@ def generate_llm_api_key(email, user_name):
     if response.status_code == 200:
         response_data = response.json()
         litellm_api_key = response_data.get("key")
-        # return litellm_api_key
-        return "sk-9vC7jTmSh7JyTgWu814XOQ"
+        log.info(f"Generated key: {litellm_api_key}")
+        return litellm_api_key
     else:
         raise Exception(f"Error at key generation: {response.status_code}, {response.json()}")
 

@@ -7,8 +7,9 @@ services:
       - .env
     volumes:
       - open-webui1:/app/backend/data
+      - ./backend/open_webui:/app/backend/open_webui
     ports:
-      - "8083:8080" # Adjust this if your app exposes a different port
+      - "8080:8080" # Adjust this if your app exposes a different port
 
   litellm:
     image: ghcr.io/berriai/litellm:main-latest

@@ -505,6 +505,7 @@ async def generate_chat_completion(
         if model_info.base_model_id:
             payload["model"] = model_info.base_model_id
 
+        payload['user'] = user.email
         params = model_info.params.model_dump()
         payload = apply_model_params_to_body_openai(params, payload)
         payload = apply_model_system_prompt_to_body(params, payload, user)

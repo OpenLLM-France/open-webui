@@ -37,7 +37,7 @@
 	const options = {
 		responsive: true,
 		borderWidth: 1,
-		tension: 0.5,
+		tension: 0.5, // Smoothes the curve; however, on Chrome-based browsers, the background may have some holes if this is enabled
 		pointHitRadius: 50,
 		pointRadius: 0,
 		aspectRatio: 2,

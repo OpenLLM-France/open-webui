@@ -2,6 +2,9 @@ import base64
 import logging
 import mimetypes
 import uuid
+import aiohttp
+from fastapi import HTTPException, status
+from fastapi.responses import RedirectResponse
 
 import aiohttp
 from authlib.integrations.starlette_client import OAuth
@@ -67,6 +70,16 @@ class OAuthManager:
                 },
                 redirect_uri=provider_config["redirect_uri"],
             )
+        self.authentik_config = {
+            "issuer": "http://163.114.159.68:8001/application/o/open-webui/",
+            "authorization_endpoint": "http://163.114.159.68:8001/application/o/authorize/",
+            "token_endpoint": "http://163.114.159.68:8001/application/o/token/",
+            "userinfo_endpoint": "http://163.114.159.68:8001/application/o/userinfo/",
+            "client_id": "rVzfdONVVWKEw3T601zp9sdyAVa6l4XUtTRh7bH9",          # Replace with your client ID
+            "client_secret": "Zaxc9q7n8RCsJgNy728AuxRqpyAYsobbfukHIaNOUVa4EyntM10KfdpqyYVx1ZMeboEyXpjiYG72zX3erG2WczFWytle8ssZlh1ox9JnM1in7mmfKMHAaePZASc30qLB",  # Replace with your client secret
+            "redirect_uri": "http://163.114.159.68:8080/oauth/oidc/callback",  # Your redirect URI
+            "scope": "openid email profile",  # Requested scopes
+        }
 
     def get_client(self, provider_name):
         return self.oauth.create_client(provider_name)
@@ -254,6 +267,164 @@ class OAuthManager:
         )
 
         # Redirect back to the frontend with the JWT token
+        redirect_url = f"{request.base_url}auth#token={jwt_token}"
+        return RedirectResponse(url=redirect_url)
+
+    async def handle_callback(self, provider, request, response):
+        if provider not in OAUTH_PROVIDERS:
+            raise HTTPException(404)
+
+        # Extract authorization code from the query parameters
+        code = request.query_params.get("code")
+        if not code:
+            raise HTTPException(400, detail="Authorization code not provided")
+
+        # Step 1: Exchange the authorization code for an access token
+        token_url = self.authentik_config["token_endpoint"]
+        data = {
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": self.authentik_config["redirect_uri"],
+            "client_id": self.authentik_config["client_id"],
+            "client_secret": self.authentik_config["client_secret"],
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(token_url, data=data) as token_response:
+                if token_response.status != 200:
+                    error_message = await token_response.text()
+                    log.warning(f"Failed to fetch access token: {error_message}")
+                    raise HTTPException(400, detail="Invalid credentials")
+                token = await token_response.json()
+
+        access_token = token.get("access_token")
+        if not access_token:
+            log.warning("Access token not found in the response")
+            raise HTTPException(400, detail="Invalid credentials")
+
+        # Step 2: Fetch user info using the access token
+        userinfo_url = self.authentik_config["userinfo_endpoint"]
+        headers = {"Authorization": f"Bearer {access_token}"}
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(userinfo_url, headers=headers) as userinfo_response:
+                if userinfo_response.status != 200:
+                    error_message = await userinfo_response.text()
+                    log.warning(f"Failed to fetch user info: {error_message}")
+                    raise HTTPException(400, detail="Invalid credentials")
+                user_data = await userinfo_response.json()
+
+        if not user_data:
+            log.warning("User info response is empty")
+            raise HTTPException(400, detail="Invalid credentials")
+
+        sub = user_data.get("sub")
+        if not sub:
+            log.warning(f"OAuth callback failed, sub is missing: {user_data}")
+            raise HTTPException(400, detail="Invalid credentials")
+        provider_sub = f"{provider}@{sub}"
+
+        email_claim = auth_manager_config.OAUTH_EMAIL_CLAIM
+        email = user_data.get(email_claim, "").lower()
+        if not email:
+            log.warning(f"OAuth callback failed, email is missing: {user_data}")
+            raise HTTPException(400, detail="Invalid credentials")
+
+        # Rest of your logic for checking/creating users and setting cookies remains unchanged
+        user = Users.get_user_by_oauth_sub(provider_sub)
+        
+        if not user:
+            # If the user does not exist, check if merging is enabled
+            if auth_manager_config.OAUTH_MERGE_ACCOUNTS_BY_EMAIL:
+                # Check if the user exists by email
+                user = Users.get_user_by_email(email)
+                if user:
+                    # Update the user with the new oauth sub
+                    Users.update_user_oauth_sub_by_id(user.id, provider_sub)
+
+        if user:
+            determined_role = self.get_user_role(user, user_data)
+            if user.role != determined_role:
+                Users.update_user_role_by_id(user.id, determined_role)
+
+        if not user:
+            # If the user does not exist, check if signups are enabled
+            if auth_manager_config.ENABLE_OAUTH_SIGNUP:
+                # Check if an existing user with the same email already exists
+                existing_user = Users.get_user_by_email(
+                    user_data.get("email", "").lower()
+                )
+                if existing_user:
+                    raise HTTPException(400, detail=ERROR_MESSAGES.EMAIL_TAKEN)
+
+                picture_claim = auth_manager_config.OAUTH_PICTURE_CLAIM
+                picture_url = user_data.get(picture_claim, "")
+                if picture_url:
+                    # Download the profile image into a base64 string
+                    try:
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(picture_url) as resp:
+                                picture = await resp.read()
+                                base64_encoded_picture = base64.b64encode(
+                                    picture
+                                ).decode("utf-8")
+                                guessed_mime_type = mimetypes.guess_type(picture_url)[0]
+                                if guessed_mime_type is None:
+                                    # assume JPG, browsers are tolerant enough of image formats
+                                    guessed_mime_type = "image/jpeg"
+                                picture_url = f"data:{guessed_mime_type};base64,{base64_encoded_picture}"
+                    except Exception as e:
+                        log.error(
+                            f"Error downloading profile image '{picture_url}': {e}"
+                        )
+                        picture_url = ""
+                if not picture_url:
+                    picture_url = "/user.png"
+                username_claim = auth_manager_config.OAUTH_USERNAME_CLAIM
+
+                role = self.get_user_role(None, user_data)
+                user = Auths.insert_new_auth(
+                    email=email,
+                    password=get_password_hash(
+                        str(uuid.uuid4())
+                    ),  # Random password, not used
+                    name=user_data.get(username_claim, "User"),
+                    profile_image_url=picture_url,
+                    role=role,
+                    oauth_sub=provider_sub,
+                )
+
+                if auth_manager_config.WEBHOOK_URL:
+                    post_webhook(
+                        auth_manager_config.WEBHOOK_URL,
+                        auth_manager_config.WEBHOOK_MESSAGES.USER_SIGNUP(user.name),
+                        {
+                            "action": "signup",
+                            "message": auth_manager_config.WEBHOOK_MESSAGES.USER_SIGNUP(
+                                user.name
+                            ),
+                            "user": user.model_dump_json(exclude_none=True),
+                        },
+                    )
+            else:
+                raise HTTPException(
+                    status.HTTP_403_FORBIDDEN, detail=ERROR_MESSAGES.ACCESS_PROHIBITED
+                )
+
+
+        jwt_token = create_token(
+            data={"id": user.id},
+            expires_delta=parse_duration(auth_manager_config.JWT_EXPIRES_IN),
+        )
+
+        response.set_cookie(
+            key="token",
+            value=jwt_token,
+            httponly=True,
+            samesite=WEBUI_SESSION_COOKIE_SAME_SITE,
+            secure=WEBUI_SESSION_COOKIE_SECURE,
+        )
+
         redirect_url = f"{request.base_url}auth#token={jwt_token}"
         return RedirectResponse(url=redirect_url)
 

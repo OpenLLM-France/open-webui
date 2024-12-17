@@ -1,6 +1,6 @@
 from fastapi import Depends, FastAPI, HTTPException, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 import stripe
 import logging
 import requests
@@ -16,7 +16,7 @@ from open_webui.config import (
 )
 
 from open_webui.constants import ERROR_MESSAGES
-from open_webui.env import ENV, SRC_LOG_LEVELS
+from open_webui.env import ENV, SRC_LOG_LEVELS, WEBUI_URL
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["STRIPE"])
@@ -41,7 +41,7 @@ app.add_middleware(
 
 @app.get("/subscription_info")
 async def get_subs_info(user: UserModel=Depends(get_current_user)):
-    spend, budget, budget_dration = get_subscription_info(key=user.llm_api_key)
+    spend, budget, budget_dration = await get_subscription_info(key=user.llm_api_key)
     return {
         "spend": spend,
         "max_budget": budget,
@@ -49,8 +49,8 @@ async def get_subs_info(user: UserModel=Depends(get_current_user)):
     }
 
 
-@app.post("/webhook2")
-async def stripe_webhook2(request: Request, stripe_signature: str = Header(None)):
+@app.post("/webhook")
+async def stripe_webhook(request: Request, stripe_signature: str = Header(None)):
     """
     Handles incoming Stripe webhook events.
     """
@@ -130,3 +130,6 @@ async def stripe_webhook2(request: Request, stripe_signature: str = Header(None)
 @app.get("/test")
 async def test_endpoint():
     return {"message": "Hello"}
+
+
+

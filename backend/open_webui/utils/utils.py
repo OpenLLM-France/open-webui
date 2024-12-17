@@ -62,9 +62,8 @@ def generate_llm_api_key(email, user_name):
     data = {
         "metadata": {"user": f"{user_name}"},
         'max_budget': 10,
-        'budget_duration': '1h',
+        # 'budget_duration': '1h',
         'key_alias': f"{user_name}",
-
         'metadata': {"team": "AiTeam", "user":user_name, "email": email}
         # "models": ["gpt-3.5-turbo", "gpt-4"], all models will be exposed. TODO: Eventually, we can set it up
     }

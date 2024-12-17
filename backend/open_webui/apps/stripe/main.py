@@ -23,6 +23,7 @@ log.setLevel(SRC_LOG_LEVELS["STRIPE"])
 
 stripe.api_key = STRIPE_SECRET_KEY
 
+
 app = FastAPI(
     docs_url="/docs" if ENV == "dev" else None,
     openapi_url="/openapi.json" if ENV == "dev" else None,
@@ -43,13 +44,13 @@ async def get_subs_info(user: UserModel=Depends(get_current_user)):
     spend, budget, budget_dration = get_subscription_info(key=user.llm_api_key)
     return {
         "spend": spend,
-        "budget": budget,
+        "max_budget": budget,
         'budget_dration': budget_dration
     }
 
 
-@app.post("/webhook")
-async def stripe_webhook(request: Request, stripe_signature: str = Header(None)):
+@app.post("/webhook2")
+async def stripe_webhook2(request: Request, stripe_signature: str = Header(None)):
     """
     Handles incoming Stripe webhook events.
     """
@@ -58,40 +59,63 @@ async def stripe_webhook(request: Request, stripe_signature: str = Header(None))
         payload = await request.body()
         sig_header = stripe_signature
 
-        log.info(f"Payload : {payload}")
-        log.info(f"WH secret : {STRIPE_WEBHOOK_SECRET}")
         # Verify the event by using the Stripe SDK
         event = stripe.Webhook.construct_event(
             payload, sig_header, STRIPE_WEBHOOK_SECRET
         )
         
         # user = get_current_user(request, get_http_authorization_cred(request.headers.get("Authorization")))
-        log.info(f"Event: {request}")
+        log.info(f" Received Event: {event['type']}")
+        
+        event_type = event["type"]
+        payment_intent = event["data"]["object"]
+
         # Handle the event (depending on its type)
-        if event["type"] == "invoice.payment_succeeded":
-            payment_intent = event["data"]["object"]
-            log.info(f"Payment for {payment_intent['amount_paid']} succeeded!")
-            # Perform actions like updating a database, sending an email, etc.
-            # Add budget to litellm
-            email = payment_intent['customer_email']
-            user = Users.get_user_by_email(email)
-            log.info(f"api_key: {user.llm_api_key}")
+        if event_type == "checkout.session.completed":
+            mode = payment_intent["mode"]
+            customer_email = payment_intent['customer_email']
+            amount = payment_intent['amount_total'] / 100
 
-            user_key = user.llm_api_key
-            current_budget = get_user_max_budget(user_key)
-            log.info("CURRENT BUDGET: ", current_budget)
-            new_budget = current_budget + payment_intent["amount_paid"]/100
-            update_user_max_budget(user_key, new_budget)
+            if mode == 'payment':
+                log.info(f"Payment: Payment for {amount} succeeded!")
+            
+                user = Users.get_user_by_email(customer_email)
+                key = user.llm_api_key
+                log.info(f"api_key: {key}")
+                current_budget = get_user_max_budget(key)
+                log.info(f"CURRENT BUDGET: {current_budget}")
 
-        elif event["type"] == "invoice.payment_failed":
-            invoice = event["data"]["object"]
-            log.error(f"Payment for Invoice {invoice['id']} failed.")
-            # Handle failed payments
+                new_budget = current_budget + amount
+                update_user_max_budget(key, max_budget=new_budget, spend=0)
+            
+            if mode == 'subscription':
+                pass 
+
+        elif event_type == "invoice.payment_succeeded":
+            amount = payment_intent['amount_paid'] / 100
+            customer_email = payment_intent['customer_email']
+            log.info(f"payment_intent: {payment_intent}")
+
+            plan = payment_intent['lines']['data'][0]['plan']
+            interval = plan['interval'] # days, months, year, etc
+            interval_count = plan['interval_count']
+
+            log.info(f"Subscription: Payment for {amount} succeeded!")
+            user = Users.get_user_by_email(customer_email)
+            key = user.llm_api_key
+
+            log.info(f"api_key: {key}")
+
+            update_user_max_budget(
+                key, 
+                max_budget=amount, 
+                spend=0,
+                budget_duration=f"{interval_count}{interval[0]}"
+            )
 
         else:
             log.error(f"Unhandled event type: {event['type']}")
 
-        # Return a 200 response to acknowledge receipt of the event
         return {"status": "success"}
     
     except stripe.error.SignatureVerificationError as e:

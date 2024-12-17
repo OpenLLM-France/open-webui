@@ -47,6 +47,7 @@
 	"Admins have access to all tools at all times; users need tools assigned per model in the workspace.": "Les administrateurs ont accès à tous les outils en permanence ; les utilisateurs doivent se voir attribuer des outils pour chaque modèle dans l’espace de travail.",
 	"Advanced Parameters": "Paramètres avancés",
 	"Advanced Params": "Paramètres avancés",
+	"Alert me when less that 20% of my tokens remain": "M'alerter lorsqu'il me reste moins de 20% de mes tokens",
 	"All chats": "Toutes les conversations",
 	"All Documents": "Tous les documents",
 	"All models deleted successfully": "Tous les modèles ont été supprimés avec succès",

@@ -44,10 +44,10 @@
 					>
 						<Coins className="size-6" />
 					</div>
-					<span class="font-bold text-3xl"> {budgetLeft}€ </span>
+					<span class="font-bold text-3xl"> {budgetLeft.toFixed(2)}€ </span>
 					<span class="font-medium text-xs">
 						<span class="text-[0.6rem]">/</span>
-						{budgetTotal}€
+						{budgetTotal.toFixed(2)}€
 					</span>
 				</div>
 			</div>

@@ -1,7 +1,8 @@
 <script lang="ts">
 	// Imports
 	import { onMount, getContext } from 'svelte';
-	import { user } from '$lib/stores';
+	import {user} from '$lib/stores';
+
 
 	let stripeScriptLoaded = false;
 
@@ -19,9 +20,9 @@
 			};
 		}
 	});
-
+	
 	let CLIENT_EMAIL = $user.email;
-	console.log(CLIENT_EMAIL);
+	console.log(CLIENT_EMAIL)
 </script>
 
 {#if stripeScriptLoaded}

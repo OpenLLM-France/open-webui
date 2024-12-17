@@ -13,6 +13,8 @@ services:
       - ./backend/open_webui:/app/backend/open_webui
     ports:
       - "8080:8080" # Adjust this if your app exposes a different port
+      - "5678:5678"   # Debugger
+
     depends_on:
       server : 
         condition: service_healthy

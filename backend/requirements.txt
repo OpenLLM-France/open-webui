@@ -101,3 +101,4 @@ googleapis-common-protos==1.63.2
 ldap3==2.9.1
 
 stripe
+debugpy

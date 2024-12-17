@@ -159,6 +159,13 @@ logging.basicConfig(stream=sys.stdout, level=GLOBAL_LOG_LEVEL)
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["MAIN"])
 
+import debugpy
+import os
+
+if os.getenv("GLOBAL_LOG_LEVEL", "false").lower() == "debug":
+    debugpy.listen(("0.0.0.0", 5678))
+    print("Debugging enabled. Waiting for debugger to attach...")
+    debugpy.wait_for_client()
 
 class SPAStaticFiles(StaticFiles):
     async def get_response(self, path: str, scope):

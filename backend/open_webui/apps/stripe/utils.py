@@ -30,7 +30,7 @@ async def get_subscription_info(key):
 
 def get_user_max_budget(key):
     """
-    Get the maximum budget for a given user key.
+    Get the maximum budget for a given user key, for a payment type subscription.
     """
     url = f"{BASE_URL}/info"
     headers = {
@@ -45,7 +45,7 @@ def get_user_max_budget(key):
     else:
         raise Exception(f"Error getting max budget: {response.status_code}, {response.json()}")
 
-def update_user_max_budget(key, max_budget):
+def update_user_max_budget(key, **kwargs):
     """
     Update the maximum budget for a given user key.
     """
@@ -56,11 +56,9 @@ def update_user_max_budget(key, max_budget):
     }
     data = {
         "key": key,
-        "max_budget": max_budget,
-        "spend" : 0
+        **kwargs
     }
     response = requests.post(url, headers=headers, data=json.dumps(data))
-
     if response.status_code == 200:
         return response.json()
     else:

@@ -20,10 +20,10 @@ async def get_subscription_info(key):
     response_data = response.json().get('info', {})
 
     if response.status_code == 200:
-        budget = response_data.get('max_budget')
+        max_budget = response_data.get('max_budget')
         spend = response_data.get('spend')
-        budget_dration = response_data.get("budget_duration")
-        return spend, budget, budget_dration
+        budget_duration = response_data.get("budget_duration")
+        return spend, max_budget, budget_duration
     else:
         raise Exception(f"Error getting max budget: {response.status_code}, {response.json()}")
 

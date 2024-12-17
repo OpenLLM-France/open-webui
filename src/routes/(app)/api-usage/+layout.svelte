@@ -1,10 +1,14 @@
 <script lang="ts">
 	// Imports
 	import { getContext } from 'svelte';
-	import { WEBUI_NAME, showSidebar } from '$lib/stores';
+	import { WEBUI_NAME, showSidebar, subscriptionInfo } from '$lib/stores';
 	import MenuLines from '$lib/components/icons/MenuLines.svelte';
+	import { getSubscriptionInfo } from '$lib/apis/stripe';
 
 	const i18n = getContext('i18n'); // Translations
+
+	// Call API to retrieve subscription information
+	getSubscriptionInfo().then((info) => subscriptionInfo.set(info));
 </script>
 
 <!-- Page title -->

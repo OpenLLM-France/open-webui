@@ -26,6 +26,8 @@
 		cutout: 90
 	};
 
+	$: data.datasets[0].data = [progress, 100 - progress]; // Update chart when progress is updated
+
 	// Set up chart
 	ChartJS.register(ArcElement, CategoryScale);
 </script>

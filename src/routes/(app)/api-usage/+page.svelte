@@ -4,17 +4,25 @@
 	import CircularProgressBar from '$lib/components/common/CircularProgressBar.svelte';
 	import Coins from '$lib/components/icons/Coins.svelte';
 	import AreaLineChart from '$lib/components/charts/AreaLineChart.svelte';
+	import { subscriptionInfo } from '$lib/stores';
 
 	const i18n = getContext('i18n'); // Translations
 
-	// Token data (Note : we'll later have to fetch the data from the backend.)
-	let tokensLeft = 700;
-	let tokensTotal = 800;
+	let tokensLeft = 0;
+	let tokensTotal = 10;
+	// Token spending data (note : we'll later have to fetch the data from the backend.)
 	let tokensSpent = {
 		timeValues: ['10/12', '11/12', '12/12', '13/12', '14/12', '15/12'],
 		promptTokens: [8, 8, 7, 6, 8, 9],
 		responseTokens: [5, 8, 9, 10, 7, 7]
 	};
+
+	subscriptionInfo.subscribe((info) => {
+		if (info.max_budget !== undefined && info.spend !== undefined) {
+			tokensLeft = info.max_budget - info.spend;
+			tokensTotal = info.max_budget;
+		}
+	});
 </script>
 
 <div class="flex flex-col">
@@ -36,8 +44,11 @@
 					>
 						<Coins className="size-6" />
 					</div>
-					<span class="font-bold text-3xl"> {tokensLeft} </span>
-					<span class="font-medium text-sm"> / {tokensTotal} </span>
+					<span class="font-bold text-3xl"> {tokensLeft}€ </span>
+					<span class="font-medium text-xs">
+						<span class="text-[0.6rem]">/</span>
+						{tokensTotal}€
+					</span>
 				</div>
 			</div>
 			<button

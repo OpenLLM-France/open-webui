@@ -41,11 +41,11 @@ app.add_middleware(
 
 @app.get("/subscription_info")
 async def get_subs_info(user: UserModel=Depends(get_current_user)):
-    spend, budget, budget_dration = await get_subscription_info(key=user.llm_api_key)
+    spend, max_budget, budget_duration = await get_subscription_info(key=user.llm_api_key)
     return {
         "spend": spend,
-        "max_budget": budget,
-        'budget_dration': budget_dration
+        "max_budget": max_budget,
+        'budget_duration': budget_duration
     }
 
 

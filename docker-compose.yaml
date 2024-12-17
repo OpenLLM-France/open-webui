@@ -50,4 +50,4 @@ services:
     restart: always
 
 volumes:
-  open-webui1:
+  open-webui-dev:

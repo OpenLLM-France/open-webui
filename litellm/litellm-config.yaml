@@ -19,7 +19,7 @@ model_list:
 
 general_settings: 
   master_key: os.environ/LITELLM_MASTER_KEY
-  database_url: postgresql://admin:secret@postgres:5432/keys_db
+  database_url: os.environ/DATABASE_URL
   # enforce_user_param: True
 
 

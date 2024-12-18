@@ -1,4 +1,5 @@
-from fastapi import Depends, FastAPI, HTTPException, Request, Header
+from fastapi import Depends, FastAPI, HTTPException, Request, Header, status
+from fastapi import responses
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 import stripe
@@ -22,7 +23,6 @@ log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["STRIPE"])
 
 stripe.api_key = STRIPE_SECRET_KEY
-
 
 app = FastAPI(
     docs_url="/docs" if ENV == "dev" else None,
@@ -63,56 +63,49 @@ async def stripe_webhook(request: Request, stripe_signature: str = Header(None))
         event = stripe.Webhook.construct_event(
             payload, sig_header, STRIPE_WEBHOOK_SECRET
         )
-        
-        # user = get_current_user(request, get_http_authorization_cred(request.headers.get("Authorization")))
         log.info(f" Received Event: {event['type']}")
-        
         event_type = event["type"]
-        payment_intent = event["data"]["object"]
-
+        event_data = event["data"]["object"]
+        log.info(f"payment_intent: {event_data}")
+        
         # Handle the event (depending on its type)
         if event_type == "checkout.session.completed":
-            mode = payment_intent["mode"]
-            customer_email = payment_intent['customer_email']
-            amount = payment_intent['amount_total'] / 100
+
+            customer_email = event_data['customer_email']
+            user = Users.get_user_by_email(customer_email)
+            key = user.llm_api_key
+            log.info(f"api_key: {key}") 
+
+            mode = event_data["mode"]
+            amount = event_data['amount_total'] / 100 
 
             if mode == 'payment':
                 log.info(f"Payment: Payment for {amount} succeeded!")
-            
-                user = Users.get_user_by_email(customer_email)
-                key = user.llm_api_key
-                log.info(f"api_key: {key}")
                 current_budget = get_user_max_budget(key)
                 log.info(f"CURRENT BUDGET: {current_budget}")
-
                 new_budget = current_budget + amount
                 update_user_max_budget(key, max_budget=new_budget, spend=0)
             
             if mode == 'subscription':
-                pass 
+                pass
 
-        elif event_type == "invoice.payment_succeeded":
-            amount = payment_intent['amount_paid'] / 100
-            customer_email = payment_intent['customer_email']
-            log.info(f"payment_intent: {payment_intent}")
-
-            plan = payment_intent['lines']['data'][0]['plan']
-            interval = plan['interval'] # days, months, year, etc
-            interval_count = plan['interval_count']
-
-            log.info(f"Subscription: Payment for {amount} succeeded!")
+        elif event_type == "invoice.payment_succeeded": # subs
+            customer_email = event_data['customer_email']
             user = Users.get_user_by_email(customer_email)
             key = user.llm_api_key
+            log.info(f"api_key: {key}") 
 
-            log.info(f"api_key: {key}")
+            amount = event_data['amount_paid'] / 100
+            plan = event_data['lines']['data'][0]['plan']
+            interval = plan['interval'] # days, months, year, etc
+            interval_count = plan['interval_count']
+            log.info(f"Subscription: Payment for {amount} succeeded!")
 
             update_user_max_budget(
-                key, 
-                max_budget=amount, 
-                spend=0,
+                key, spend=0, 
+                max_budget=None,
                 budget_duration=f"{interval_count}{interval[0]}"
             )
-
         else:
             log.error(f"Unhandled event type: {event['type']}")
 
@@ -127,9 +120,7 @@ async def stripe_webhook(request: Request, stripe_signature: str = Header(None))
         print(f"Error while handling webhook: {str(e)}")
         raise HTTPException(status_code=400, detail=f"Webhook error {str(e)}")
 
+
 @app.get("/test")
 async def test_endpoint():
     return {"message": "Hello"}
-
-
-

@@ -23,7 +23,7 @@ async def get_subscription_info(key):
         max_budget = response_data.get('max_budget')
         spend = response_data.get('spend')
         budget_duration = response_data.get("budget_duration")
-        return round(float(spend), 2), round(float(max_budget), 2), budget_duration
+        return spend, max_budget, budget_duration
     else:
         raise Exception(f"Error getting max budget: {response.status_code}, {response.json()}")
 
@@ -63,4 +63,4 @@ def update_user_max_budget(key, **kwargs):
         return response.json()
     else:
         raise Exception(f"Error updating max budget: {response.status_code}, {response.json()}")
-
+    

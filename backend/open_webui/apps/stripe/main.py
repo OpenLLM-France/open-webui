@@ -45,7 +45,8 @@ async def get_subs_info(user: UserModel=Depends(get_current_user)):
     return {
         "spend": spend,
         "max_budget": max_budget,
-        'budget_duration': budget_duration
+        'budget_duration': budget_duration,
+        'type_subscription': "Subscription" if max_budget is None else "One-Time Payment"
     }
 
 

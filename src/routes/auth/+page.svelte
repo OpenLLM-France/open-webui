@@ -202,7 +202,7 @@
 								{/if}
 							</div>
 
-							{#if true || ($config?.onboarding ?? false)}
+							{#if $config?.onboarding ?? false}
 								<div class="mt-1 text-xs md:text-sm text-gray-500 text-center">
 									ⓘ {$WEBUI_NAME}
 									{$i18n.t(
@@ -214,7 +214,7 @@
 
 						{#if $config?.features.enable_login_form || $config?.features.enable_ldap}
 							<div class="flex flex-col mt-4">
-								{#if mode === 'signup' || true}
+								{#if mode === 'signup'}
 									<div class="mb-4">
 										<div class=" text-sm font-medium text-left mb-1">{$i18n.t('Name')}</div>
 										<input
@@ -318,7 +318,7 @@
 						</div>
 					</form>
 
-					{#if Object.keys($config?.oauth?.providers ?? {}).length > 0 || true}
+					{#if Object.keys($config?.oauth?.providers ?? {}).length > 0}
 						<div class="flex items-center justify-center w-full">
 							<hr class="w-full h-px my-6 border-0 dark:bg-gray-100/10 bg-gray-700/10" />
 							{#if $config?.features.enable_login_form || $config?.features.enable_ldap}
@@ -332,7 +332,7 @@
 							<hr class="w-full h-px my-4 border-0 dark:bg-gray-100/10 bg-gray-700/10" />
 						</div>
 						<div class="flex flex-col space-y-2">
-							{#if $config?.oauth?.providers?.google || true}
+							{#if $config?.oauth?.providers?.google}
 								<button
 									class="flex justify-center items-center bg-gray-700/5 hover:bg-gray-700/10 dark:bg-gray-100/5 dark:hover:bg-gray-100/10 dark:text-gray-300 dark:hover:text-white transition w-full rounded-full font-medium text-sm py-2.5"
 									on:click={() => {
@@ -357,7 +357,7 @@
 									<span>{$i18n.t('Continue with {{provider}}', { provider: 'Google' })}</span>
 								</button>
 							{/if}
-							{#if $config?.oauth?.providers?.microsoft || true}
+							{#if $config?.oauth?.providers?.microsoft}
 								<button
 									class="flex justify-center items-center bg-gray-700/5 hover:bg-gray-700/10 dark:bg-gray-100/5 dark:hover:bg-gray-100/10 dark:text-gray-300 dark:hover:text-white transition w-full rounded-full font-medium text-sm py-2.5"
 									on:click={() => {
@@ -382,7 +382,7 @@
 									<span>{$i18n.t('Continue with {{provider}}', { provider: 'Microsoft' })}</span>
 								</button>
 							{/if}
-							{#if $config?.oauth?.providers?.oidc || true}
+							{#if $config?.oauth?.providers?.oidc}
 								<button
 									class="flex justify-center items-center bg-gray-700/5 hover:bg-gray-700/10 dark:bg-gray-100/5 dark:hover:bg-gray-100/10 dark:text-gray-300 dark:hover:text-white transition w-full rounded-full font-medium text-sm py-2.5"
 									on:click={() => {
@@ -414,7 +414,7 @@
 						</div>
 					{/if}
 
-					{#if ($config?.features.enable_ldap && $config?.features.enable_login_form) || true}
+					{#if ($config?.features.enable_ldap && $config?.features.enable_login_form)}
 						<div class="mt-2">
 							<button
 								class="flex justify-center items-center text-xs w-full text-center underline"

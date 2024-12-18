@@ -5,6 +5,7 @@
 	import Coins from '$lib/components/icons/Coins.svelte';
 	import AreaLineChart from '$lib/components/charts/AreaLineChart.svelte';
 	import { subscriptionInfo } from '$lib/stores';
+	import Switch from '$lib/components/common/Switch.svelte';
 
 	const i18n = getContext('i18n'); // Translations
 
@@ -26,7 +27,7 @@
 </script>
 
 <div class="flex flex-col">
-	<!-- Token usage -->
+	<!-- API Usage -->
 	<h1 class="pb-12 text-4xl font-bold">{$i18n.t('API Usage')}</h1>
 	<div class="md:flex md:space-x-12 max-md:space-y-12 md:mr-12">
 		<div
@@ -44,18 +45,19 @@
 					>
 						<Coins className="size-6" />
 					</div>
-					<span class="font-bold text-3xl"> {budgetLeft}€ </span>
+					<span class="font-bold text-3xl"> {budgetLeft.toFixed(2)}€ </span>
 					<span class="font-medium text-xs">
 						<span class="text-[0.6rem]">/</span>
-						{budgetTotal}€
+						{budgetTotal.toFixed(2)}€
 					</span>
 				</div>
 			</div>
-			<button
+			<a
+				href="/subscription"
 				class="bg-gray-100 rounded-full font-medium px-8 py-3 text-sm hover:bg-gray-200 transition"
 			>
 				{$i18n.t('Refill')}
-			</button>
+			</a>
 		</div>
 
 		<!-- Tokens spent -->
@@ -83,6 +85,15 @@
 					<span>{$i18n.t('Responses')}</span>
 				</div>
 			</div>
+		</div>
+	</div>
+
+	<!-- Settings -->
+	<h1 class="py-8 text-3xl font-bold">{$i18n.t('Settings')}</h1>
+	<div class="flex flex-col">
+		<div class="flex space-x-4">
+			<input type="checkbox" class="toggle" checked />
+			<span>{$i18n.t('Alert me when less that 20% of my tokens remain')}</span>
 		</div>
 	</div>
 </div>

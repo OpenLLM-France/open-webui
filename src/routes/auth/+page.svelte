@@ -118,6 +118,7 @@
 			await signInHandler();
 		} else {
 			onboarding = $config?.onboarding ?? false;
+			if (onboarding) mode = $config?.features.enable_ldap ? 'ldap' : 'signup';
 		}
 	});
 </script>
@@ -148,7 +149,12 @@
 			</div>
 		</div>
 		<div class="fixed top-8 right-16">
-			<img crossorigin="anonymous" src="/linagora-ai.png" class="h-12" alt="logo" />
+			<img
+				crossorigin="anonymous"
+				src="/assets/logos/linagora-ai.png"
+				class="h-12"
+				alt="Linagora AI logo"
+			/>
 		</div>
 
 		<div
@@ -158,8 +164,18 @@
 				class="flex flex-col px-16 py-12 relative w-full h-screen items-start bg-[url('/assets/design/abstract-circle.png')] bg-no-repeat bg-contain"
 			>
 				<div class="flex space-x-4">
-					<img crossorigin="anonymous" src="/openllm-qrcode.png" class="h-20" alt="logo" />
-					<img crossorigin="anonymous" src="/lucie-logo.png" class="h-20" alt="logo" />
+					<img
+						crossorigin="anonymous"
+						src="/assets/openllm-qrcode.png"
+						class="h-20"
+						alt="OpenLLM QR Code"
+					/>
+					<img
+						crossorigin="anonymous"
+						src="/assets/logos/lucie.png"
+						class="h-20"
+						alt="Lucie logo"
+					/>
 				</div>
 				<div class="w-1/2 mt-12">
 					<div class="text-5xl font-semibold leading-snug tracking-wide">
@@ -169,28 +185,66 @@
 						avec des données d'entraînement <br /> 100% transparentes
 					</div>
 				</div>
+				<!-- Logos -->
 				<div class="grow flex flex-col justify-end items-start space-y-8 z-50">
 					<img
 						crossorigin="anonymous"
 						src="/assets/logos/france-2030-laureat.png"
 						class="h-32"
-						alt="logo"
+						alt="France 2030 Lauréat logo"
 					/>
-					<div class="flex space-x-8">
+					<div class="flex items-center space-x-8">
 						<img
 							crossorigin="anonymous"
 							src="/assets/logos/openllm-france.png"
 							class="h-20"
-							alt="logo"
+							alt="OpenLLM France logo"
 						/>
-						<img crossorigin="anonymous" src="/assets/logos/logos.png" class="h-20" alt="logo" />
+						<img
+							crossorigin="anonymous"
+							src="/assets/logos/opsci.png"
+							class="h-16"
+							alt="OPSCI logo"
+						/>
+						<img
+							crossorigin="anonymous"
+							src="/assets/logos/talkr-ai.png"
+							class="h-16"
+							alt="Talkr.ai logo"
+						/>
+						<img
+							crossorigin="anonymous"
+							src="/assets/logos/class-code.png"
+							class="w-32"
+							alt="Class'Code logo"
+						/>
+						<img crossorigin="anonymous" src="/assets/logos/cea.png" class="h-16" alt="CEA logo" />
+						<img
+							crossorigin="anonymous"
+							src="/assets/logos/cnrs.png"
+							class="h-16"
+							alt="CNRS logo"
+						/>
+						<img
+							crossorigin="anonymous"
+							src="/assets/logos/loria.png"
+							class="h-16"
+							alt="Loria logo"
+						/>
+						<img crossorigin="anonymous" src="/assets/logos/lix.png" class="h-16" alt="LIX logo" />
+						<img
+							crossorigin="anonymous"
+							src="/assets/logos/sorbonne.png"
+							class="w-32"
+							alt="Sorbonne logo"
+						/>
 					</div>
 				</div>
 				<img
 					crossorigin="anonymous"
 					src="/assets/images/lucie.png"
 					class="absolute h-4/5 right-24"
-					alt="logo"
+					alt="Lucie illustration"
 				/>
 			</div>
 			<div class="w-full sm:max-w-md pr-16 min-h-screen flex flex-col text-center">
@@ -464,9 +518,9 @@
 						<div class="pt-8">
 							<img
 								crossorigin="anonymous"
-								src="/openllm-qrcode.png"
+								src="/assets/openllm-qrcode.png"
 								class="h-24 mx-auto"
-								alt="logo"
+								alt="OpenLLM QR Code"
 							/>
 						</div>
 					</div>

@@ -128,6 +128,7 @@
 	</title>
 </svelte:head>
 
+<!-- 
 <OnBoarding
 	bind:show={onboarding}
 	getStartedHandler={() => {
@@ -135,6 +136,7 @@
 		mode = $config?.features.enable_ldap ? 'ldap' : 'signup';
 	}}
 />
+-->
 
 <div class="w-full h-screen max-h-[100dvh] text-white relative">
 	<div class="w-full h-full absolute top-0 left-0 bg-white dark:bg-black"></div>
@@ -142,21 +144,56 @@
 	{#if loaded}
 		<div class="fixed m-10 z-50">
 			<div class="flex space-x-2">
-				<div class=" self-center">
-					<img
-						crossorigin="anonymous"
-						src="{WEBUI_BASE_URL}/static/favicon.png"
-						class=" w-6 rounded-full"
-						alt="logo"
-					/>
-				</div>
+				<div class=" self-center"></div>
 			</div>
+		</div>
+		<div class="fixed top-8 right-16">
+			<img crossorigin="anonymous" src="/linagora-ai.png" class="h-12" alt="logo" />
 		</div>
 
 		<div
-			class="fixed bg-transparent min-h-screen w-full flex justify-center font-primary z-50 text-black dark:text-white"
+			class="fixed bg-transparent min-h-screen w-full flex justify-between font-primary z-50 text-black dark:text-white"
 		>
-			<div class="w-full sm:max-w-md px-10 min-h-screen flex flex-col text-center">
+			<div
+				class="flex flex-col px-16 py-12 relative w-full h-screen items-start bg-[url('/assets/design/abstract-circle.png')] bg-no-repeat bg-contain"
+			>
+				<div class="flex space-x-4">
+					<img crossorigin="anonymous" src="/openllm-qrcode.png" class="h-20" alt="logo" />
+					<img crossorigin="anonymous" src="/lucie-logo.png" class="h-20" alt="logo" />
+				</div>
+				<div class="w-1/2 mt-12">
+					<div class="text-5xl font-semibold leading-snug tracking-wide">
+						La première IA <br /> générative réellement <br /> Open Source
+					</div>
+					<div class="text-3xl font-semibold leading-relaxed tracking-wide">
+						avec des données d'entraînement <br /> 100% transparentes
+					</div>
+				</div>
+				<div class="grow flex flex-col justify-end items-start space-y-8 z-50">
+					<img
+						crossorigin="anonymous"
+						src="/assets/logos/france-2030-laureat.png"
+						class="h-32"
+						alt="logo"
+					/>
+					<div class="flex space-x-8">
+						<img
+							crossorigin="anonymous"
+							src="/assets/logos/openllm-france.png"
+							class="h-20"
+							alt="logo"
+						/>
+						<img crossorigin="anonymous" src="/assets/logos/logos.png" class="h-20" alt="logo" />
+					</div>
+				</div>
+				<img
+					crossorigin="anonymous"
+					src="/assets/images/lucie.png"
+					class="absolute h-4/5 right-24"
+					alt="logo"
+				/>
+			</div>
+			<div class="w-full sm:max-w-md pr-16 min-h-screen flex flex-col text-center">
 				{#if ($config?.features.auth_trusted_header ?? false) || $config?.features.auth === false}
 					<div class=" my-auto pb-10 w-full">
 						<div
@@ -423,6 +460,15 @@
 								</button>
 							</div>
 						{/if}
+
+						<div class="pt-8">
+							<img
+								crossorigin="anonymous"
+								src="/openllm-qrcode.png"
+								class="h-24 mx-auto"
+								alt="logo"
+							/>
+						</div>
 					</div>
 				{/if}
 			</div>

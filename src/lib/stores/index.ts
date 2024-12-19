@@ -53,12 +53,15 @@ export const temporaryChatEnabled = writable(false);
 export const scrollPaginationEnabled = writable(false);
 export const currentChatPage = writable(1);
 
+export const termsOfUseAccepted = writable(false);
+
 // Tokens spent and left
 export const subscriptionInfo: Writable<SubscriptionInfo> = writable({
 	spend: 0,
 	max_budget: 10,
 	budget_duration: "1h"
 });
+
 
 export type Model = OpenAIModel | OllamaModel;
 

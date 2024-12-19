@@ -80,6 +80,7 @@
 	import EventConfirmDialog from '../common/ConfirmDialog.svelte';
 	import Placeholder from './Placeholder.svelte';
 	import { getTools } from '$lib/apis/tools';
+	import TermsOfUse from '../TermsOfUse.svelte';
 
 	export let chatIdProp = '';
 
@@ -2166,6 +2167,8 @@
 	</title>
 </svelte:head>
 
+<TermsOfUse />
+
 <audio id="audioElement" src="" style="display: none;" />
 
 <EventConfirmDialog
@@ -2191,7 +2194,7 @@
 	<div
 		class="h-screen max-h-[100dvh] {$showSidebar
 			? 'md:max-w-[calc(100%-260px)]'
-			: ''} w-full max-w-full flex flex-col"
+			: ''} w-full max-w-full flex flex-col relative"
 		id="chat-container"
 	>
 		{#if $settings?.backgroundImageUrl ?? null}

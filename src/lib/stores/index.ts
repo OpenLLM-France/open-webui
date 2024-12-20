@@ -55,7 +55,8 @@ export const scrollPaginationEnabled = writable(false);
 export const currentChatPage = writable(1);
 
 // Store on the user computer whether he accepted the terms of use or not
-export const termsOfUse = persisted("terms", { show: true, accepted: false });
+// TODO : Load previous data when user connects again
+export const termsOfUse = persisted("terms", { show: false, accepted: false });
 
 // Tokens spent and left
 export const subscriptionInfo: Writable<SubscriptionInfo> = writable({

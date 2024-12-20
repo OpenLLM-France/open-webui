@@ -836,8 +836,14 @@
 
 	const submitPrompt = async (userPrompt, { _raw = false } = {}) => {
 		console.log('submitPrompt', userPrompt, $chatId);
+		console.log(history);
 
-		if (!$termsOfUse.accepted) {
+		// The user is allowed to prompt if it's his first ever prompt
+		if (
+			!$termsOfUse.accepted &&
+			!(history.currentId === null) &&
+			!(Object.keys(history.messages).length === 0)
+		) {
 			toast.error('Please accept the terms of use.');
 			$termsOfUse.show = true;
 			return;

@@ -66,17 +66,17 @@
 	<div class="h-screen w-screen absolute backdrop-blur-[1px] backdrop:disabled z-50 bg-white/30"></div>
 	<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 	<div
-		class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 h-2/3 p-12 pb-8 flex flex-col border shadow-xl rounded-3xl bg-white z-50"
+		class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 md:w-1/2 h-4/5 md:h-2/3 p-6 md:p-12 pb-4 md:pb-8 flex flex-col border shadow-xl rounded-3xl bg-white z-50"
 		tabindex="0"
 		bind:this={popupRef}
 	>
-		<div class="mb-8 text-3xl font-bold">
+		<div class="mb-4 md:mb-8 md:text-3xl font-bold">
 			{$i18n.t('Please accept the terms of use to keep chatting')}
 		</div>
 
 		<div
 			id="terms"
-			class="overflow-y-auto shadow-inner border py-2 px-4 text-gray-600"
+			class="overflow-y-auto shadow-inner border p-2 md:px-4 text-xs md:text-base text-gray-600"
 			on:scroll={handleScroll}
 		>
 			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus in nisl luctus, imperdiet mi
@@ -183,9 +183,9 @@
 			bibendum. Morbi pharetra elit sed ante molestie, ut finibus neque varius.
 		</div>
 
-		<div class="mt-8 self-end flex space-x-6">
+		<div class="mt-4 md:mt-8 self-end flex space-x-3 md:space-x-6">
 			<button
-				class="py-3 px-6 rounded-full text-gray-500 hover:text-red-800 disabled:text-gray-500 disabled:cursor-not-allowed"
+				class="py-2 md:py-3 px-4 md:px-6 rounded-full text-sm md:text-base text-gray-500 hover:text-red-800 disabled:text-gray-500 disabled:cursor-not-allowed"
 				disabled={!termsScrolled}
 				on:click={() => {
 					$termsOfUse.show = false;
@@ -195,7 +195,7 @@
 				{$i18n.t('Decline')}
 			</button>
 			<button
-				class="py-3 px-6 bg-black text-white rounded-full hover:bg-gray-800 disabled:bg-gray-500 disabled:cursor-not-allowed"
+				class="py-2 md:py-3 px-4 md:px-6 bg-black text-white rounded-full text-sm md:text-base hover:bg-gray-800 disabled:bg-gray-500 disabled:cursor-not-allowed"
 				disabled={!termsScrolled}
 				on:click={() => {
 					$termsOfUse.show = false;

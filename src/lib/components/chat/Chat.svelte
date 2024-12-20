@@ -35,7 +35,8 @@
 		showOverview,
 		chatTitle,
 		showArtifacts,
-		tools
+		tools,
+		termsOfUse
 	} from '$lib/stores';
 	import {
 		convertMessagesToHistory,
@@ -835,6 +836,18 @@
 
 	const submitPrompt = async (userPrompt, { _raw = false } = {}) => {
 		console.log('submitPrompt', userPrompt, $chatId);
+		console.log(history);
+
+		// The user is allowed to prompt if it's his first ever prompt
+		if (
+			!$termsOfUse.accepted &&
+			!(history.currentId === null) &&
+			!(Object.keys(history.messages).length === 0)
+		) {
+			toast.error('Please accept the terms of use.');
+			$termsOfUse.show = true;
+			return;
+		}
 
 		const messages = createMessagesList(history.currentId);
 		const _selectedModels = selectedModels.map((modelId) =>
@@ -1866,6 +1879,12 @@
 	const regenerateResponse = async (message) => {
 		console.log('regenerateResponse');
 
+		if (!$termsOfUse.accepted) {
+			toast.error('Please accept the terms of use.');
+			$termsOfUse.show = true;
+			return;
+		}
+
 		if (history.currentId) {
 			let userMessage = history.messages[message.parentId];
 			let userPrompt = userMessage.content;
@@ -2191,7 +2210,7 @@
 	<div
 		class="h-screen max-h-[100dvh] {$showSidebar
 			? 'md:max-w-[calc(100%-260px)]'
-			: ''} w-full max-w-full flex flex-col"
+			: ''} w-full max-w-full flex flex-col relative"
 		id="chat-container"
 	>
 		{#if $settings?.backgroundImageUrl ?? null}

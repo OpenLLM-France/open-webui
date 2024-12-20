@@ -35,7 +35,8 @@
 		showOverview,
 		chatTitle,
 		showArtifacts,
-		tools
+		tools,
+		termsOfUse
 	} from '$lib/stores';
 	import {
 		convertMessagesToHistory,
@@ -80,7 +81,6 @@
 	import EventConfirmDialog from '../common/ConfirmDialog.svelte';
 	import Placeholder from './Placeholder.svelte';
 	import { getTools } from '$lib/apis/tools';
-	import TermsOfUse from '../TermsOfUse.svelte';
 
 	export let chatIdProp = '';
 
@@ -836,6 +836,12 @@
 
 	const submitPrompt = async (userPrompt, { _raw = false } = {}) => {
 		console.log('submitPrompt', userPrompt, $chatId);
+
+		if (!$termsOfUse.accepted) {
+			toast.error('Please accept the terms of use.');
+			$termsOfUse.show = true;
+			return;
+		}
 
 		const messages = createMessagesList(history.currentId);
 		const _selectedModels = selectedModels.map((modelId) =>
@@ -1867,6 +1873,12 @@
 	const regenerateResponse = async (message) => {
 		console.log('regenerateResponse');
 
+		if (!$termsOfUse.accepted) {
+			toast.error('Please accept the terms of use.');
+			$termsOfUse.show = true;
+			return;
+		}
+
 		if (history.currentId) {
 			let userMessage = history.messages[message.parentId];
 			let userPrompt = userMessage.content;
@@ -2166,8 +2178,6 @@
 			: `${$WEBUI_NAME}`}
 	</title>
 </svelte:head>
-
-<TermsOfUse />
 
 <audio id="audioElement" src="" style="display: none;" />
 

@@ -53,7 +53,7 @@ export const temporaryChatEnabled = writable(false);
 export const scrollPaginationEnabled = writable(false);
 export const currentChatPage = writable(1);
 
-export const termsOfUseAccepted = writable(false);
+export const termsOfUse = writable({ show: true, accepted: false });
 
 // Tokens spent and left
 export const subscriptionInfo: Writable<SubscriptionInfo> = writable({

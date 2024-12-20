@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { termsOfUseAccepted } from '$lib/stores';
+	// Imports
+	import { termsOfUse } from '$lib/stores';
 	import { getContext, onMount } from 'svelte';
 
 	const i18n = getContext('i18n'); // Translations
@@ -61,8 +62,8 @@
 	});
 </script>
 
-{#if !$termsOfUseAccepted}
-	<div class="h-screen w-screen absolute backdrop-blur-sm backdrop:disabled z-50 bg-white/30"></div>
+{#if !$termsOfUse.accepted && $termsOfUse.show}
+	<div class="h-screen w-screen absolute backdrop-blur-[1px] backdrop:disabled z-50 bg-white/30"></div>
 	<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 	<div
 		class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 h-2/3 p-12 pb-8 flex flex-col border shadow-xl rounded-3xl bg-white z-50"
@@ -186,6 +187,10 @@
 			<button
 				class="py-3 px-6 rounded-full text-gray-500 hover:text-red-800 disabled:text-gray-500 disabled:cursor-not-allowed"
 				disabled={!termsScrolled}
+				on:click={() => {
+					$termsOfUse.show = false;
+					$termsOfUse.accepted = false;
+				}}
 			>
 				{$i18n.t('Decline')}
 			</button>
@@ -193,7 +198,8 @@
 				class="py-3 px-6 bg-black text-white rounded-full hover:bg-gray-800 disabled:bg-gray-500 disabled:cursor-not-allowed"
 				disabled={!termsScrolled}
 				on:click={() => {
-					$termsOfUseAccepted = true;
+					$termsOfUse.show = false;
+					$termsOfUse.accepted = true;
 				}}
 			>
 				{$i18n.t('Accept')}

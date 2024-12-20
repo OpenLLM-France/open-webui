@@ -1,4 +1,6 @@
-from fastapi import Depends, FastAPI, HTTPException, Request, Header, status
+from collections import defaultdict
+from typing import Optional
+from fastapi import Depends, FastAPI, HTTPException, Request, Header, status, Query
 from fastapi import responses
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
@@ -8,16 +10,22 @@ import requests
 from open_webui.apps.webui.models.users import UserModel, Users
 from open_webui.utils.utils import get_current_user, get_http_authorization_cred
 
-from .utils import get_user_max_budget, update_user_max_budget, get_subscription_info
+from sqlalchemy import create_engine
+from sqlalchemy.sql import text, cast
+from sqlalchemy.orm import sessionmaker
+from datetime import datetime, date, timedelta
+
+
+from .utils import get_user_max_budget, update_user_max_budget, get_subscription_info, hash_token
 
 from open_webui.config import (
     CORS_ALLOW_ORIGIN,
     STRIPE_WEBHOOK_SECRET,
     STRIPE_SECRET_KEY
 )
-
+from pydantic import BaseModel
 from open_webui.constants import ERROR_MESSAGES
-from open_webui.env import ENV, SRC_LOG_LEVELS, WEBUI_URL
+from open_webui.env import DATABASE_URL, ENV, SRC_LOG_LEVELS, WEBUI_URL
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["STRIPE"])
@@ -37,6 +45,116 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Create engine and session
+engine = create_engine(DATABASE_URL)
+Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+class TotalSpending(BaseModel):
+    total_spend: float
+    total_input_tokens: int
+    total_output_tokens: int
+
+class DailyTotalSpending(TotalSpending):
+    day: date
+    
+class SpendingPerModel:
+    model: str
+    daily_spending: list[DailyTotalSpending]
+    
+
+def get_db():
+    db = Session()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@app.get("/spendings")
+async def global_spend_per_user(
+     start_date: Optional[str] = Query(
+        default='2024-12-18',
+        description="Time from which to start viewing spend",
+    ),
+    end_date: Optional[str] = Query(
+        default='2024-12-20',
+        description="Time till which to view spend",
+    ),
+    per_day: Optional[str]=Query(
+        default=False,
+        description="If `True`, the model_cost, total_input_tokens, total_output_tokens are computed per model, per day given the time frame. Else, it's aggragated per model",
+    ),
+    user: UserModel=Depends(get_current_user), db_session: Session=Depends(get_db)
+):
+    if start_date is None or end_date is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"error": "Please provide start_date and end_date"},
+        )
+    
+    api_key = hash_token(user.llm_api_key)
+
+    # Start from beginning of start_date
+    start_date = datetime.strptime(start_date, "%Y-%m-%d")
+    # End at the end of end_date
+    end_date = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1) - timedelta(seconds=1)
+
+    query_text = """
+    SELECT 
+        DATE("startTime") as day,
+        model,
+        SUM(spend) as total_spend,
+        SUM(prompt_tokens) as total_input_tokens,
+        SUM(completion_tokens) as total_output_tokens
+    FROM "LiteLLM_SpendLogs"
+    WHERE 
+        "startTime" BETWEEN :start_date AND :end_date
+        AND api_key = :api_key
+    GROUP BY DATE("startTime"), model
+    ORDER BY model, day DESC;
+    """
+    result = db_session.execute(
+        text(query_text).bindparams(
+            start_date=start_date,
+            end_date=end_date,
+            api_key=api_key
+        )
+    )
+
+    # Group results by model
+    model_spending = defaultdict(list)
+    for row in result.fetchall():
+        model_name = row.model
+        daily_spend = DailyTotalSpending(
+            day=row.day,
+            total_spend=row.total_spend,
+            total_input_tokens=row.total_input_tokens,
+            total_output_tokens=row.total_output_tokens
+        )
+        model_spending[model_name].append(daily_spend)
+
+    log.info(f"Result: {model_spending}")
+
+    if per_day:
+        daily_spending_per_model = [
+            {'model':model, 'daily_spending':spending}
+            for model, spending in model_spending.items()
+        ]
+        return daily_spending_per_model
+    else:
+        aggregated_spending = []
+        for model_name, daily_spendings in model_spending.items():
+            aggregated_spending.append(
+                {
+                    'model': model_name,
+                    'total_spend': sum(spend.total_spend for spend in daily_spendings),
+                    'total_input_tokens': sum(spend.total_input_tokens for spend in daily_spendings),
+                    'total_output_tokens': sum(spend.total_output_tokens for spend in daily_spendings)
+                }
+            )
+        
+        return aggregated_spending
 
 
 @app.get("/subscription_info")

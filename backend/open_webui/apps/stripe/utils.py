@@ -11,6 +11,14 @@ BASE_URL = os.path.join(LITELLM_HOST, "key")
 print(f"BASE_URL: {BASE_URL}")
 
 
+def hash_token(token: str):
+    import hashlib
+    # Hash the string using SHA-256
+    hashed_token = hashlib.sha256(token.encode()).hexdigest()
+
+    return hashed_token
+
+
 async def get_subscription_info(key):
     url = f"{BASE_URL}/info"
     headers = {

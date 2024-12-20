@@ -1,5 +1,6 @@
 import { APP_NAME } from '$lib/constants';
 import { type Writable, writable } from 'svelte/store';
+import { persisted } from 'svelte-persisted-store'
 import type { GlobalModelConfig, ModelConfig } from '$lib/apis';
 import type { Banner } from '$lib/types';
 import type { Socket } from 'socket.io-client';
@@ -53,7 +54,8 @@ export const temporaryChatEnabled = writable(false);
 export const scrollPaginationEnabled = writable(false);
 export const currentChatPage = writable(1);
 
-export const termsOfUse = writable({ show: true, accepted: false });
+// Store on the user computer whether he accepted the terms of use or not
+export const termsOfUse = persisted("terms", { show: true, accepted: false });
 
 // Tokens spent and left
 export const subscriptionInfo: Writable<SubscriptionInfo> = writable({
@@ -61,7 +63,6 @@ export const subscriptionInfo: Writable<SubscriptionInfo> = writable({
 	max_budget: 10,
 	budget_duration: "1h"
 });
-
 
 export type Model = OpenAIModel | OllamaModel;
 

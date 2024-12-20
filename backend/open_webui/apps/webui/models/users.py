@@ -1,10 +1,16 @@
+import logging
 import time
 from typing import Optional
 
+from open_webui.env import SRC_LOG_LEVELS
 from open_webui.apps.webui.internal.db import Base, JSONField, get_db
 from open_webui.apps.webui.models.chats import Chats
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import BigInteger, Column, String, Text
+
+log = logging.getLogger(__name__)
+log.setLevel(SRC_LOG_LEVELS["DB"])
+
 
 ####################
 # User DB Schema
@@ -160,8 +166,13 @@ class UsersTable:
             return [UserModel.model_validate(user) for user in users]
 
     def get_num_users(self) -> Optional[int]:
-        with get_db() as db:
-            return db.query(User).count()
+        try:
+            with get_db() as db:  # Using the corrected `get_db`
+                return db.query(User).count()
+        except Exception as e:
+            log.error(f"Error fetching user count: {e}")
+            return None
+
 
     def get_first_user(self) -> UserModel:
         try:

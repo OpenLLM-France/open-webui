@@ -65,7 +65,8 @@ export const subscriptionInfo: Writable<SubscriptionInfo> = writable({
 	budget_duration: "1h"
 });
 
-export const timeRemaining = persisted("timeRemaining", -1);
+// Time at which the user should be kicked from using Lucie
+export const endTimestamp = persisted("endTimestamp", -1);
 
 export type Model = OpenAIModel | OllamaModel;
 

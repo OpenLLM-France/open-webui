@@ -14,12 +14,12 @@ model_list:
       api_base: os.environ/BASE_URL
       api_key: os.environ/LLAMA31_API_KEY
       max_tokens: 1000
-      input_cost_per_token: 0.001
-      output_cost_per_token: 0.001
+      input_cost_per_token: 0.000003
+      output_cost_per_token: 0.000003
 
 general_settings: 
   master_key: os.environ/LITELLM_MASTER_KEY
-  database_url: os.environ/DATABASE_URL
+  database_url: os.environ/DATABASE_URL_LITELLM
   # enforce_user_param: True
 
 

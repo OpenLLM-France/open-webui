@@ -5,9 +5,9 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
-    volumes:
-      - open-webui1:/app/backend/data
+    volumes:      
       - ./backend/open_webui:/app/backend/open_webui
+      - open-webui1:/app/backend/data
     ports:
       - "8080:8080" # Adjust this if your app exposes a different port
 
@@ -27,7 +27,6 @@ services:
     
     depends_on:
       - postgres  # Ensure the PostgreSQL service is started before litellm
-
 
   postgres:
     image: postgres:latest

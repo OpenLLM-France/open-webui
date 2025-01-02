@@ -263,6 +263,7 @@ else:
     pass
 
 DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{DATA_DIR}/webui.db")
+DATABASE_URL_LITELLM = os.environ.get("DATABASE_URL_LITELLM") # TODO: In the future, use DATABASE_URL instead. It requires to combine the two databases (Litellm & openwebui)
 
 # Replace the postgres:// with postgresql://
 if "postgres://" in DATABASE_URL:

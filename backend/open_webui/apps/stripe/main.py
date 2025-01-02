@@ -25,7 +25,7 @@ from open_webui.config import (
 )
 from pydantic import BaseModel
 from open_webui.constants import ERROR_MESSAGES
-from open_webui.env import DATABASE_URL, ENV, SRC_LOG_LEVELS, WEBUI_URL
+from open_webui.env import DATABASE_URL_LITELLM, ENV, SRC_LOG_LEVELS, WEBUI_URL
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["STRIPE"])
@@ -47,7 +47,7 @@ app.add_middleware(
 )
 
 # Create engine and session
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL_LITELLM)
 Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

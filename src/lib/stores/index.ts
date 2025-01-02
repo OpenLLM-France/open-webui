@@ -65,6 +65,8 @@ export const subscriptionInfo: Writable<SubscriptionInfo> = writable({
 	budget_duration: "1h"
 });
 
+export const timeRemaining = persisted("timeRemaining", -1);
+
 export type Model = OpenAIModel | OllamaModel;
 
 type BaseModel = {

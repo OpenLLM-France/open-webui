@@ -6,7 +6,7 @@
 
 	const SECOND: number = 1000;
 	const MINUTE: number = 60 * SECOND;
-	const DEFAULT_DURATION: number = 2 * MINUTE;
+	const DEFAULT_DURATION: number = 15 * MINUTE;
 
 	let timeRemaining: number;
 

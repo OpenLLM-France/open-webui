@@ -703,6 +703,7 @@ ENABLE_LOGIN_FORM = PersistentConfig(
 )
 
 
+
 DEFAULT_LOCALE = PersistentConfig(
     "DEFAULT_LOCALE",
     "ui.default_locale",

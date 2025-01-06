@@ -5,8 +5,8 @@ model_list:
       api_base: os.environ/BASE_URL
       api_key: os.environ/LUCIE_API_KEY
       max_tokens: 1000
-      input_cost_per_token: 0.000003
-      output_cost_per_token: 0.000015
+      input_cost_per_token: 0.001
+      output_cost_per_token: 0.001
   
   - model_name: Meta_Llama_31_8b_it
     litellm_params:

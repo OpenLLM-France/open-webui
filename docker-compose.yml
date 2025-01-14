@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+      - "5678:5678"
+    environment:
+      REDIS_HOST: redis
+      CELERY_BROKER_URL: redis://redis:6379
+      CELERY_RESULT_BACKEND: redis://redis:6379
+      PYTHONDONTWRITEBYTECODE: 1
+      PYTHONUNBUFFERED: 1
+      DEBUG: "true"
+    depends_on:
+      - redis
+      - celery
+    networks:
+      - queue-network
+    volumes:
+      - ./app:/app/app
+      - ./pytest.ini:/app/pytest.ini
+    command: poetry run python -m debugpy --listen 0.0.0.0:5678 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/queue/metrics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - ./frontend/.env:/app/.env
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_ENABLE_CONSOLE_LOGS=true
+    networks:
+      - queue-network
+    depends_on:
+      - web
+    command: npm run dev -- --host 0.0.0.0
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    environment:
+      REDIS_HOST: redis
+      CELERY_BROKER_URL: redis://redis:6379
+      CELERY_RESULT_BACKEND: redis://redis:6379
+    depends_on:
+      - redis
+    networks:
+      - queue-network
+    volumes:
+      - ./app:/app/app
+      - ./pytest.ini:/app/pytest.ini
+    command: poetry run celery -A app.queue_manager worker --loglevel=info
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - queue-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  redis-data:
+
+networks:
+  queue-network:
+    driver: bridge
+

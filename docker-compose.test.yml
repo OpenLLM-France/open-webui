@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  redis-test:
+    image: redis:alpine
+    ports:
+      - "6380:6379"
+    command: redis-server --save "" --appendonly no
+    volumes:
+      - redis-data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  celery-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      REDIS_HOST: redis-test
+      REDIS_PORT: 6379
+      PYTHONPATH: /app
+      CELERY_BROKER_URL: redis://redis-test:6379
+      CELERY_RESULT_BACKEND: redis://redis-test:6379
+    depends_on:
+      - redis-test
+    volumes:
+      - ./app:/app/app
+      - ./tests:/app/tests
+      - ./pytest.ini:/app/pytest.ini
+    command: poetry run python tests/run_celery_worker.py
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      REDIS_HOST: redis-test
+      REDIS_PORT: 6379
+      PYTHONPATH: /app
+      CELERY_BROKER_URL: redis://redis-test:6379
+      CELERY_RESULT_BACKEND: redis://redis-test:6379
+    ports:
+      - "8001:8000"
+    depends_on:
+      - redis-test
+      - celery-test
+    volumes:
+      - ./app:/app/app
+      - ./tests:/app/tests
+      - ./pytest.ini:/app/pytest.ini
+    command: poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      REDIS_HOST: redis-test
+      REDIS_PORT: 6379
+      PYTHONPATH: /app
+      CELERY_BROKER_URL: redis://redis-test:6379
+      CELERY_RESULT_BACKEND: redis://redis-test:6379
+      API_URL: http://api:8000
+      TEST_PATH: ${TEST_PATH:-tests/}
+      PYTHONUNBUFFERED: 1
+      PYTEST_ADDOPTS: "--cov=app --cov-report=term-missing"
+      DOCKER_ENV: "true"
+    depends_on:
+      - redis-test
+      - api
+      - celery-test
+    volumes:
+      - ./app:/app/app
+      - ./tests:/app/tests
+      - ./pytest.ini:/app/pytest.ini
+    command: sh -c 'poetry run pytest -v ${TEST_PATH}'
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+volumes:
+  redis-data: 

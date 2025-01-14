@@ -1,0 +1,32 @@
+#!/bin/bash
+
+echo "Running pre-commit checks..."
+
+echo "1. Running format checks..."
+poetry run format black --check
+if [ $? -ne 0 ]; then
+    echo "❌ Code formatting check failed. Run 'poetry run format black' to fix."
+    exit 1
+fi
+
+poetry run format isort --check
+if [ $? -ne 0 ]; then
+    echo "❌ Import sorting check failed. Run 'poetry run format isort' to fix."
+    exit 1
+fi
+
+poetry run format lint
+if [ $? -ne 0 ]; then
+    echo "❌ Linting failed. Please fix the issues above."
+    exit 1
+fi
+
+echo "2. Running tests..."
+poetry run test run
+if [ $? -ne 0 ]; then
+    echo "❌ Tests failed. Please fix the failing tests."
+    exit 1
+fi
+
+echo "✅ All checks passed!"
+exit 0 

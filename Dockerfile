@@ -80,6 +80,8 @@ ENV RAG_EMBEDDING_MODEL="$USE_EMBEDDING_MODEL_DOCKER" \
 ENV TIKTOKEN_ENCODING_NAME="cl100k_base" \
     TIKTOKEN_CACHE_DIR="/app/backend/data/cache/tiktoken"
 
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+
 ## Hugging Face download cache ##
 ENV HF_HOME="/app/backend/data/cache/embedding/models"
 

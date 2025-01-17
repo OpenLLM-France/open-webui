@@ -69,7 +69,8 @@ async def lifespan(app: FastAPI):
         decode_responses=True
     )
     app.state.redis = redis
-    app.state.queue_manager = QueueManager(redis)
+    queue_manager : QueueManager= QueueManager(redis)
+    app.state.queue_manager = queue_manager
     app.state.connection_manager = manager
     
     # Configurer le gestionnaire de connexions
@@ -148,7 +149,7 @@ async def join(request: JoinRequest, queue_manager: QueueManager = Depends(get_q
     """Ajoute un utilisateur à la file d'attente."""
     try:
         result = await queue_manager.add_to_queue(request.user_id)
-
+        queue.join(request.user_id)
         logging.info(f"join {request.user_id} result: {result}")
         if result is None:
             raise HTTPException(
@@ -159,23 +160,85 @@ async def join(request: JoinRequest, queue_manager: QueueManager = Depends(get_q
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post("/heartbeat")
+async def heartbeat_body(
+    data: QueueActionRequest,
+    queue_manager: QueueManager = Depends(get_queue_manager)
+) -> Dict:
+    """Endpoint pour maintenir la session active (via corps JSON)."""
+    return await heartbeat_path(data.user_id, queue_manager)
+
+@router.post("/heartbeat/{user_id}")
+async def heartbeat_path(
+    user_id: str,
+    queue_manager: QueueManager = Depends(get_queue_manager)
+) -> Dict:
+    """Endpoint pour maintenir la session active (via paramètre URL)."""
+    success = await queue_manager.extend_session(user_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="No active session found")
+    
+    # Vérifier que l'utilisateur est toujours dans active_users
+    is_active = await queue_manager.redis.sismember("active_users", user_id)
+    if not is_active:
+        raise HTTPException(status_code=404, detail="User not in active users")
+    
+    # Récupérer le TTL actuel
+    ttl = await queue_manager.redis.ttl(f"session:{user_id}")
+    
+    return {
+        "status": "extended",
+        "user_id": user_id,
+        "ttl": ttl
+    }
 
 ############################
 # Get Queue Status
 ############################
 
 @router.get("/status/{user_id}", response_model=dict[str, Any])
-async def get_status(user_id: str):
-    log.debug(f'-> status({user_id})')
-    out = queue.status(user_id)
+async def get_status(data: QueueActionRequest, queue_manager: QueueManager = Depends(get_queue_manager)):
+    """Récupère le statut d'un utilisateur."""
+    user_id = data.user_id
+    try:
+        status = await queue_manager.get_user_status(user_id)
+        out = queue.status(user_id)
+        if out is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f'Unknown user {user_id}'
+            )
+        return status
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     
-    if out is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Unknown user {user_id}'
-        )
+############################
+@router.get("/get_users")
+async def get_users(queue_manager: QueueManager = Depends(get_queue_manager)) -> Dict:
+    """Récupère les listes d'utilisateurs en attente, en draft et actifs."""
+    try:
+        # Récupérer les utilisateurs en attente
+        waiting_users = await queue_manager.redis.lrange('waiting_queue', 0, -1)
+        waiting_users = [user.decode('utf-8') if isinstance(user, bytes) else user for user in waiting_users]
+        
+        # Récupérer les utilisateurs en draft
+        draft_users = await queue_manager.redis.smembers('draft_users')
+        draft_users = [user.decode('utf-8') if isinstance(user, bytes) else user for user in draft_users]
+        
+        # Récupérer les utilisateurs actifs
+        active_users = await queue_manager.redis.smembers('active_users')
+        active_users = [user.decode('utf-8') if isinstance(user, bytes) else user for user in active_users]
+        
+        return {
+            "waiting_users": waiting_users,
+            "draft_users": draft_users,
+            "active_users": active_users
+        }
     
-    return out
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 
 ###########################Leave
 # Confirm Queue Position
@@ -202,23 +265,16 @@ async def confirm(request: ConfirmRequest):
         signature=None  # TODO
     )
 
-############################
-# Queue Maintenance
-############################
-
-@router.post("/idle", response_model=dict)
-async def idle():
-    queue.idle()
-    return {}
-
 
 ############################
 # Queue Metrics
 ############################
 
-@router.post("/metrics", response_model=QueueMetrics)
-async def get_metrics(request: MetricsRequest):
-    return queue.metrics(user_id=request.user_id)
+@router.get("/metrics")
+async def get_metrics(queue_manager: QueueManager = Depends(get_queue_manager)) -> Dict:
+    """Endpoint pour obtenir les métriques de la file d'attente."""
+    metrics = await queue_manager.get_metrics()
+    return metrics
 
 ############################
 # Queue Leave

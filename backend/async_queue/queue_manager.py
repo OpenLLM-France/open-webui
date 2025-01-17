@@ -8,7 +8,7 @@ import time
 import logging
 from typing import Dict, Any, List
 import datetime
-from app.celery_app import celery  # Remplacer la création locale de Celery
+from celery_app import celery  # Remplacer la création locale de Celery
 
 # Configuration de Celery
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')

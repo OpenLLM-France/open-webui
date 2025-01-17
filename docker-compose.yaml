@@ -19,6 +19,8 @@ services:
       interval: 1s
       timeout: 60s
       retries: 3
+    depends_on:
+      - redis
 
   litellm:
     image: ghcr.io/berriai/litellm:main-latest
@@ -41,6 +43,58 @@ services:
       - ./litellm/postgres_data:/var/lib/postgresql/data
     restart: always
 
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    environment:
+      REDIS_HOST: redis
+      CELERY_BROKER_URL: redis://redis:6379
+      CELERY_RESULT_BACKEND: redis://redis:6379
+    depends_on:
+      - redis
+
+    volumes:
+      - ./app:/app/app
+      - ./pytest.ini:/app/pytest.ini
+
+    command: poetry run celery -A app.queue_manager worker --loglevel=info
+
+  celery_worker:
+    build: .
+    command: poetry run celery -A app.celery_app worker --pool=solo -l INFO
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app
+      - REDIS_HOST=redis
+      - DEBUG=true
+      - TESTING=true
+      - CELERY_BROKER_URL=redis://redis:6379
+      - CELERY_RESULT_BACKEND=redis://redis:6379
+    depends_on:
+      - redis
+
+
+
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+
+
 volumes:
+  redis-data:
   open-webui-dev1:
   persistent_data:

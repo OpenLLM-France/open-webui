@@ -28,7 +28,6 @@ dependencies = [
     "alembic==1.14.0",
     "peewee==3.17.8",
     "peewee-migrate==1.12.2",
-    "psycopg2-binary==2.9.9",
     "pgvector==0.3.5",
     "PyMySQL==1.1.1",
     "bcrypt==4.2.0",
@@ -120,9 +119,6 @@ classifiers = [
 [project.scripts]
 open-webui = "open_webui:app"
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
@@ -158,3 +154,44 @@ skip = '.git*,*.svg,package-lock.json,i18n,*.lock,*.css,*-bundle.js,locales,exam
 check-hidden = true
 # ignore-regex = ''
 ignore-words-list = 'ans'
+
+[tool.poetry]
+name = "open-webui"
+description = "Open WebUI"
+version = "1.1.0" 
+authors = ["Timothy Jaeryang Baek <tim@openwebui.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+fastapi = "0.111.0"
+uvicorn = {extras = ["standard"], version = "0.30.6"}
+pydantic = "2.9.2"
+python-multipart = "0.0.18"
+Flask = "3.1.0"
+Flask-Cors = "5.0.0"
+python-socketio = "5.11.3"
+python-jose = "3.3.0"
+passlib = {extras = ["bcrypt"], version = "1.7.4"}
+requests = "2.32.3"
+aiohttp = "3.11.8"
+async-timeout = "*"
+aiocache = "*"
+aiofiles = "*"
+sqlalchemy = "2.0.32"
+alembic = "1.14.0"
+peewee = "3.17.8"
+peewee-migrate = "1.12.2"
+psycopg = "^3.1.18"
+pgvector = "0.3.5"
+PyMySQL = "1.1.1"
+bcrypt = "4.2.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0","hatchling"]
+build-backend = ["poetry.core.masonry.api","hatchling.build"]

@@ -841,8 +841,7 @@
             <ContactUs bind:show={showContactUs} />
         {/if}
 
-        <!-- Removing user button from sidebar entirely -->
-		<!-- <div class="px-2">
+		<div class="px-2">
 			<div class="flex flex-col font-primary">
 				{#if $user !== undefined}
 					<UserMenu
@@ -871,7 +870,7 @@
 					</UserMenu>
 				{/if}
 			</div>
-		</div> -->
+		</div>
 	</div>
 </div>
 

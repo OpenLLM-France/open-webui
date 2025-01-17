@@ -308,6 +308,7 @@
 	"Enable Message Rating": "",
 	"Enable Mirostat sampling for controlling perplexity. (Default: 0, 0 = Disabled, 1 = Mirostat, 2 = Mirostat 2.0)": "",
 	"Enable New Sign Ups": "Activer les nouvelles inscriptions",
+	"Enable Confirm by mail": "Activer la confirmation par Email",
 	"Enable Web Search": "Activer la recherche sur le Web",
 	"Enabled": "",
 	"Engine": "Moteur",

@@ -36,6 +36,7 @@ from open_webui.config import (
     ENABLE_LOGIN_FORM,
     ENABLE_MESSAGE_RATING,
     ENABLE_SIGNUP,
+    ENABLE_CONFIRM_BY_MAIL,
     ENABLE_API_KEY,
     ENABLE_EVALUATION_ARENA_MODELS,
     EVALUATION_ARENA_MODELS,
@@ -101,6 +102,7 @@ log.setLevel(SRC_LOG_LEVELS["MAIN"])
 app.state.config = AppConfig()
 
 app.state.config.ENABLE_SIGNUP = ENABLE_SIGNUP
+app.state.config.ENABLE_CONFIRM_BY_MAIL = ENABLE_CONFIRM_BY_MAIL
 app.state.config.ENABLE_LOGIN_FORM = ENABLE_LOGIN_FORM
 app.state.config.ENABLE_API_KEY = ENABLE_API_KEY
 

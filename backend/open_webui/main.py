@@ -150,6 +150,7 @@ from open_webui.utils.utils import (
     get_verified_user,
 )
 from open_webui.utils.access_control import has_access
+from open_webui.constants import ERROR_MESSAGES
 
 if SAFE_MODE:
     print("SAFE MODE ENABLED")
@@ -200,7 +201,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     docs_url="/docs" if ENV == "dev" else None,
     openapi_url="/openapi.json" if ENV == "dev" else None,
-    redoc_url=None,
+    redoc_url="/redocs" if ENV == "dev" else None,
     lifespan=lifespan,
 )
 
@@ -236,6 +237,58 @@ app.state.config.AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE = (
 app.state.config.TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE = (
     TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE
 )
+
+
+##################################
+#
+# Activate Accout by mail Middleware
+#
+##################################
+
+class BypassActivate_accountMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if request.url.path == "/activate_account":
+            response = await call_next(request)
+            return response
+
+        response = await call_next(request)
+        return response
+
+app.add_middleware(BypassActivate_accountMiddleware)
+
+########################################################
+# Change User status when follow route+token
+########################################################
+
+
+@app.get('/activate_account/user_id/{user_id}/token/{token}')
+async def activate_account(user_id: str, token: str):
+    log.debug(f"Received request to activate account for user_id={user_id} with token={token}")
+    user = Users.get_user_by_id(user_id)
+    if not user:
+        log.error(f"User not found for user_id={user_id}")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="ERROR_MESSAGES.USER_NOT_FOUND",
+        )
+
+    if user.llm_api_key != token:
+        log.warning(f"Invalid token for user_id={user_id}: expected {user.llm_api_key}, got {token}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=ERROR_MESSAGES.INVALID_TOKEN,
+        )
+
+    updated_user = Users.update_user_role_by_id(user_id,"user")
+    if updated_user:
+        log.info(f"Successfully updated role to USER for user_id={user_id}")
+        return RedirectResponse("/")
+
+    log.error(f"Failed to update role for user_id={user_id}")
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=ERROR_MESSAGES.DEFAULT(),
+    )
 
 ##################################
 #
@@ -2614,6 +2667,7 @@ async def get_app_config(request: Request):
             "enable_ldap": webui_app.state.config.ENABLE_LDAP,
             "enable_api_key": webui_app.state.config.ENABLE_API_KEY,
             "enable_signup": webui_app.state.config.ENABLE_SIGNUP,
+            "enable_confirm_by_mail": webui_app.state.config.ENABLE_CONFIRM_BY_MAIL,
             "enable_login_form": webui_app.state.config.ENABLE_LOGIN_FORM,
             **(
                 {

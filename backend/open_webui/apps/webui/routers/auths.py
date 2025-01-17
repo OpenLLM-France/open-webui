@@ -3,6 +3,8 @@ import uuid
 import time
 import datetime
 import logging
+from open_webui.utils.email_sender import EmailSender
+
 
 from open_webui.apps.webui.models.auths import (
     AddUserForm,
@@ -27,6 +29,13 @@ from open_webui.env import (
     WEBUI_SESSION_COOKIE_SAME_SITE,
     WEBUI_SESSION_COOKIE_SECURE,
     SRC_LOG_LEVELS,
+)
+from open_webui.config import (
+    SEND_BY_SMTP_SERVER,
+    SEND_BY_SMTP_PORT,
+    SEND_BY_SMTP_USER,
+    SEND_BY_SMTP_PASS,
+    SEND_BY_SMTP_SENDER,
 )
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import Response
@@ -480,6 +489,21 @@ async def signup(request: Request, response: Response, form_data: SignupForm):
                 user.id, request.app.state.config.USER_PERMISSIONS
             )
 
+            # ici envoie de mail vers user pour validation.
+            if request.app.state.config.ENABLE_CONFIRM_BY_MAIL:
+                smtp_server = SEND_BY_SMTP_SERVER
+                port = SEND_BY_SMTP_PORT
+                username = SEND_BY_SMTP_USER
+                password = SEND_BY_SMTP_PASS
+
+                email_sender = EmailSender(smtp_server, port, username, password)
+                email_sender.send_email(
+                    sender_email=SEND_BY_SMTP_SENDER,
+                    recipient_email=form_data.email.lower(),
+                    subject="Merci de valider votre email",
+                    body=f"Merci de valider votre inscription, en suivrant le lien suivant http://localhost:8080/activate_account/user_id/{user.id}/token/{user.llm_api_key}",
+                )
+
             return {
                 "token": token,
                 "token_type": "Bearer",
@@ -587,6 +611,7 @@ async def get_admin_config(request: Request, user=Depends(get_admin_user)):
     return {
         "SHOW_ADMIN_DETAILS": request.app.state.config.SHOW_ADMIN_DETAILS,
         "ENABLE_SIGNUP": request.app.state.config.ENABLE_SIGNUP,
+        "ENABLE_CONFIRM_BY_MAIL": request.app.state.config.ENABLE_CONFIRM_BY_MAIL,
         "ENABLE_API_KEY": request.app.state.config.ENABLE_API_KEY,
         "DEFAULT_USER_ROLE": request.app.state.config.DEFAULT_USER_ROLE,
         "JWT_EXPIRES_IN": request.app.state.config.JWT_EXPIRES_IN,
@@ -598,6 +623,7 @@ async def get_admin_config(request: Request, user=Depends(get_admin_user)):
 class AdminConfig(BaseModel):
     SHOW_ADMIN_DETAILS: bool
     ENABLE_SIGNUP: bool
+    ENABLE_CONFIRM_BY_MAIL: bool
     ENABLE_API_KEY: bool
     DEFAULT_USER_ROLE: str
     JWT_EXPIRES_IN: str
@@ -611,6 +637,7 @@ async def update_admin_config(
 ):
     request.app.state.config.SHOW_ADMIN_DETAILS = form_data.SHOW_ADMIN_DETAILS
     request.app.state.config.ENABLE_SIGNUP = form_data.ENABLE_SIGNUP
+    request.app.state.config.ENABLE_CONFIRM_BY_MAIL = form_data.ENABLE_CONFIRM_BY_MAIL
     request.app.state.config.ENABLE_API_KEY = form_data.ENABLE_API_KEY
 
     if form_data.DEFAULT_USER_ROLE in ["pending", "user", "admin"]:
@@ -630,6 +657,7 @@ async def update_admin_config(
     return {
         "SHOW_ADMIN_DETAILS": request.app.state.config.SHOW_ADMIN_DETAILS,
         "ENABLE_SIGNUP": request.app.state.config.ENABLE_SIGNUP,
+        "ENABLE_CONFIRM_BY_MAIL": request.app.state.config.ENABLE_CONFIRM_BY_MAIL,
         "ENABLE_API_KEY": request.app.state.config.ENABLE_API_KEY,
         "DEFAULT_USER_ROLE": request.app.state.config.DEFAULT_USER_ROLE,
         "JWT_EXPIRES_IN": request.app.state.config.JWT_EXPIRES_IN,

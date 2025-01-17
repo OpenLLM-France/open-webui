@@ -91,10 +91,16 @@
 			<div>
 				<div class=" mb-3 text-sm font-medium">{$i18n.t('General Settings')}</div>
 
-				<div class="  flex w-full justify-between pr-2">
+				<div class="  flex w-full justify-between pr-2 mb-3">
 					<div class=" self-center text-xs font-medium">{$i18n.t('Enable New Sign Ups')}</div>
 
 					<Switch bind:state={adminConfig.ENABLE_SIGNUP} />
+				</div>
+
+				<div class="  flex w-full justify-between pr-2 mb-3">
+					<div class=" self-center text-xs font-medium">{$i18n.t('Enable Confirm by mail')}</div>
+
+					<Switch bind:state={adminConfig.ENABLE_CONFIRM_BY_MAIL} />
 				</div>
 
 				<div class="  my-3 flex w-full justify-between">

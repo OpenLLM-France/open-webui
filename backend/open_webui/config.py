@@ -696,13 +696,17 @@ ENABLE_SIGNUP = PersistentConfig(
     ),
 )
 
+ENABLE_CONFIRM_BY_MAIL = PersistentConfig(
+    "ENABLE_CONFIRM_BY_MAIL",
+    "auth.confirm_by_email.enable",
+    os.environ.get("ENABLE_CONFIRM_BY_MAIL", "False").lower() == "true",
+)
+
 ENABLE_LOGIN_FORM = PersistentConfig(
     "ENABLE_LOGIN_FORM",
     "ui.ENABLE_LOGIN_FORM",
     os.environ.get("ENABLE_LOGIN_FORM", "True").lower() == "true",
 )
-
-
 
 DEFAULT_LOCALE = PersistentConfig(
     "DEFAULT_LOCALE",
@@ -1855,3 +1859,13 @@ STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 ####################################
 LITELLM_MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY", "")
 LITELLM_HOST = os.environ.get("LITELLM_HOST", "http://litellm:4000")
+
+
+####################################
+# SMTP
+####################################
+SEND_BY_SMTP_SERVER = os.environ.get("SEND_BY_SMTP_SERVER", "")
+SEND_BY_SMTP_PORT = os.environ.get("SEND_BY_SMTP_PORT", "")
+SEND_BY_SMTP_USER = os.environ.get("SEND_BY_SMTP_USER", "")
+SEND_BY_SMTP_PASS = os.environ.get("SEND_BY_SMTP_PASS", "")
+SEND_BY_SMTP_SENDER = os.environ.get("SEND_BY_SMTP_SENDER", "")

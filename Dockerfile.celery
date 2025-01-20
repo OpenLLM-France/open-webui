@@ -22,4 +22,4 @@ RUN poetry install --no-dev --no-interaction --no-ansi
 
 COPY . .
 
-CMD ["poetry", "run", "uvicorn", "open_webui.app:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["poetry", "run", "python", "-m", "celery", "-A", "backend.async_queue.celery_app:celery_app", "worker", "--loglevel=info"]

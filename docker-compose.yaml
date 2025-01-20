@@ -55,16 +55,17 @@ services:
       - redis
 
     volumes:
-      - ./app:/app/app
-      - ./pytest.ini:/app/pytest.ini
+      - ./backend/async_queue:/app/backend/async_queue
 
-    command: poetry run celery -A app.queue_manager worker --loglevel=info
+
+    command: poetry run celery -A backend.async_queue.queue_manager worker --loglevel=info
 
   celery_worker:
     build: .
-    command: poetry run celery -A app.celery_app worker --pool=solo -l INFO
+    command: poetry run celery -A backend.async_queue.queue_manager worker --loglevel=info
     volumes:
-      - .:/app
+      - ./backend/async_queue:/app/backend/async_queue
+
     environment:
       - PYTHONPATH=/app
       - REDIS_HOST=redis

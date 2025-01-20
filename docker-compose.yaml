@@ -13,19 +13,14 @@ services:
       - ./backend/open_webui:/app/backend/open_webui
       - open-webui-dev1:/app/backend/data
     ports:
-      - "8080:8080" # Adjust this if your app exposes a different port
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "--request", "POST", "http://webui:8080/queue/idle" ]
-      interval: 1s
-      timeout: 60s
-      retries: 3
+      - "8000:8080" # Adjust this if your app exposes a different port
     depends_on:
       - redis
 
   litellm:
     image: ghcr.io/berriai/litellm:main-latest
-    ports:
-      - "4000:4000"
+    # ports:
+    #   - "4000:4000"
     volumes:
       - ./litellm/litellm-config.yaml:/app/config.yaml
     env_file:

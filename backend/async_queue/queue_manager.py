@@ -11,7 +11,7 @@ import datetime
 from .celery_app import celery_app  # Assurez-vous que celery_app.py existe dans le même dossier
 
 # Configuration de Celery
-REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 
 celery = Celery(
@@ -1065,7 +1065,7 @@ class QueueManager:
             return {
                 "active_users": real_active_users,
                 "waiting_users": len(real_waiting_users),
-                "draft_users": decoded_draft_users,
+                "draft_users": len(decoded_draft_users),
                 "total_slots": self.max_active_users,
                 "total_accounts": total_accounts
             }
@@ -1172,7 +1172,7 @@ async def cleanup_session(user_id: str):
     redis = None
     try:
         redis = Redis(
-            host=os.getenv('REDIS_HOST', 'localhost'),
+            host=os.getenv('REDIS_HOST', 'redis'),
             port=int(os.getenv('REDIS_PORT', 6379)),
             decode_responses=True
         )
@@ -1239,7 +1239,7 @@ async def handle_draft_expiration(user_id: str):
     redis = None
     try:
         redis = Redis(
-            host=os.getenv('REDIS_HOST', 'localhost'),
+            host=os.getenv('REDIS_HOST', 'redis'),
             port=int(os.getenv('REDIS_PORT', 6379)),
             decode_responses=True
         )
@@ -1292,7 +1292,7 @@ async def auto_expiration(ttl, timer_type, user_id):
     redis_client = None
     try:
         redis_client = Redis(
-            host=os.getenv('REDIS_HOST', 'localhost'),
+            host=os.getenv('REDIS_HOST', 'redis'),
             port=int(os.getenv('REDIS_PORT', 6379)),
             decode_responses=True
         )
@@ -1336,7 +1336,7 @@ async def update_timer_channel(channel: str, initial_ttl: int, timer_type: str, 
     redis_client = None
     try:
         redis_client = Redis(
-            host=os.getenv('REDIS_HOST', 'localhost'),
+            host=os.getenv('REDIS_HOST', 'redis'),
             port=int(os.getenv('REDIS_PORT', 6379)),
             decode_responses=True
         )

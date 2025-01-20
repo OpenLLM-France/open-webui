@@ -58,7 +58,7 @@ async def lifespan(app: FastAPI):
     """Gestionnaire de cycle de vie de l'application."""
     # Initialisation
     redis = Redis(
-        host=os.getenv('REDIS_HOST', 'localhost'),
+        host=os.getenv('REDIS_HOST', 'redis'),
         port=int(os.getenv('REDIS_PORT', 6379)),
         db=int(os.getenv('REDIS_DB', 0)),
         decode_responses=True
@@ -81,8 +81,8 @@ async def lifespan(app: FastAPI):
             task_eager_propagates=True,
             broker_connection_retry=False,
             broker_connection_max_retries=0,
-            result_backend='redis://localhost:6379',
-            broker_url='redis://localhost:6379'
+            result_backend='redis://redis:6379',
+            broker_url='redis://redis:6379'
         )
         logger.info("Mode test détecté, Celery configuré en mode eager")
     
@@ -106,7 +106,7 @@ app.add_middleware(
 # Configuration Redis
 async def get_redis():
     redis = Redis(
-        host=os.getenv('REDIS_HOST', 'localhost'),
+        host=os.getenv('REDIS_HOST', 'redis'),
         port=int(os.getenv('REDIS_PORT', 6379)),
         db=int(os.getenv('REDIS_DB', 0)),
         decode_responses=True

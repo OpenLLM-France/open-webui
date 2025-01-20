@@ -7,7 +7,7 @@ from typing import Optional, Any
 from open_webui.env import SRC_LOG_LEVELS
 from open_webui.models.queue import queue, QueueStatus, QueueMetrics, JoinRequest, ConfirmRequest, ConfirmResponse, DeleteRequest, MetricsRequest
 from fastapi import APIRouter, HTTPException, status
-from async_queue.main import QueueManager
+from async_queue.queue_manager import QueueManager
 from fastapi import FastAPI, HTTPException, WebSocket, Depends, WebSocketDisconnect
 from contextlib import asynccontextmanager
 import os
@@ -63,7 +63,7 @@ async def lifespan(app: FastAPI):
     """Gestionnaire de cycle de vie de l'application."""
     # Initialisation
     redis = Redis(
-        host=os.getenv('REDIS_HOST', 'localhost'),
+        host=os.getenv('REDIS_HOST', 'redis'),
         port=int(os.getenv('REDIS_PORT', 6379)),
         db=int(os.getenv('REDIS_DB', 0)),
         decode_responses=True
@@ -87,8 +87,8 @@ async def lifespan(app: FastAPI):
             task_eager_propagates=True,
             broker_connection_retry=False,
             broker_connection_max_retries=0,
-            result_backend='redis://localhost:6379',
-            broker_url='redis://localhost:6379'
+            result_backend='redis://redis:6379',
+            broker_url='redis://redis:6379'
         )
         logger.info("Mode test détecté, Celery configuré en mode eager")
     
@@ -100,19 +100,10 @@ async def lifespan(app: FastAPI):
 router = APIRouter(lifespan=lifespan)
 
 
-
-router.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # Configuration Redis
 async def get_redis():
     redis = Redis(
-        host=os.getenv('REDIS_HOST', 'localhost'),
+        host=os.getenv('REDIS_HOST', 'redis'),
         port=int(os.getenv('REDIS_PORT', 6379)),
         db=int(os.getenv('REDIS_DB', 0)),
         decode_responses=True
@@ -143,13 +134,13 @@ class MaxUsersUpdate(BaseModel):
 # Join Queue
 ############################
 
-@router.post("/join", response_model=dict[str, int])
+@router.post("/join")
 async def join(request: JoinRequest, queue_manager: QueueManager = Depends(get_queue_manager)):
 
     """Ajoute un utilisateur à la file d'attente."""
     try:
         result = await queue_manager.add_to_queue(request.user_id)
-        queue.join(request.user_id)
+        # queue.join(request.user_id)
         logging.info(f"join {request.user_id} result: {result}")
         if result is None:
             raise HTTPException(
@@ -197,18 +188,17 @@ async def heartbeat_path(
 # Get Queue Status
 ############################
 
-@router.get("/status/{user_id}", response_model=dict[str, Any])
-async def get_status(data: QueueActionRequest, queue_manager: QueueManager = Depends(get_queue_manager)):
+@router.get("/status/{user_id}")
+async def get_status(user_id, queue_manager: QueueManager = Depends(get_queue_manager)):
     """Récupère le statut d'un utilisateur."""
-    user_id = data.user_id
     try:
         status = await queue_manager.get_user_status(user_id)
-        out = queue.status(user_id)
-        if out is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f'Unknown user {user_id}'
-            )
+        # out = queue.status(user_id)
+        # if out is None:
+        #     raise HTTPException(
+        #         status_code=status.HTTP_404_NOT_FOUND,
+        #         detail=f'Unknown user {user_id}'
+        #     )
         return status
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

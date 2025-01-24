@@ -75,6 +75,7 @@ from open_webui.routers import (
     utils,
     queue,
     contact,
+    stripe,
 )
 
 from open_webui.routers.retrieval import (
@@ -745,6 +746,7 @@ app.include_router(ollama.router, prefix="/ollama", tags=["ollama"])
 app.include_router(openai.router, prefix="/openai", tags=["openai"])
 app.include_router(queue.router, prefix="/queue", tags=["queue"])
 app.include_router(contact.router, prefix="/contact", tags=["contact"])
+app.include_router(stripe.router, prefix="/stripe", tags=["stripe"])
 
 
 app.include_router(pipelines.router, prefix="/api/v1/pipelines", tags=["pipelines"])

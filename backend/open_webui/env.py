@@ -90,6 +90,7 @@ log_sources = [
     "RAG",
     "WEBHOOK",
     "SOCKET",
+    "STRIPE",
 ]
 
 SRC_LOG_LEVELS = {}
@@ -403,6 +404,13 @@ OFFLINE_MODE = os.environ.get("OFFLINE_MODE", "false").lower() == "true"
 
 if OFFLINE_MODE:
     os.environ["HF_HUB_OFFLINE"] = "1"
+
+####################################
+# STRIPE
+####################################
+STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY", "")
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 
 ####################################
 # LiteLLM

@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.7-labs
 # Initialize device type args
 # use build args in the docker build command with --build-arg="BUILDARG=true"
 ARG USE_CUDA=false
@@ -30,7 +30,7 @@ COPY package.json package-lock.json ./
 RUN npm add -D terser
 RUN npm ci
 
-COPY . .
+COPY --exclude=backend . .
 ENV APP_BUILD_HASH=${BUILD_HASH}
 ENV NODE_OPTIONS=--max-old-space-size=8192
 RUN npm run build
@@ -89,7 +89,8 @@ ENV HF_HOME="/app/backend/data/cache/embedding/models"
 # ENV TORCH_EXTENSIONS_DIR="/.cache/torch_extensions"
 
 #### Other models ##########################################################
-
+# copy backend files
+COPY --chown=$UID:$GID ./backend ./backend
 WORKDIR /app/backend
 
 ENV HOME=/root

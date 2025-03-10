@@ -1,5 +1,9 @@
 [
 	{
+		"code": "fr-FR",
+		"title": "French (France)"
+	},
+	{
 		"code": "en-US",
 		"title": "English (US)"
 	},
@@ -58,10 +62,6 @@
 	{
 		"code": "fr-CA",
 		"title": "French (Canada)"
-	},
-	{
-		"code": "fr-FR",
-		"title": "French (France)"
 	},
 	{
 		"code": "el-GR",

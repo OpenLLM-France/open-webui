@@ -25,7 +25,8 @@
 		temporaryChatEnabled,
 		isLastActiveTab,
 		isApp,
-		appInfo
+		appInfo,
+		locale
 	} from '$lib/stores';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -464,15 +465,18 @@
 		// so `/error` can show something that's not `undefined`.
 
 		initI18n();
-		if (!localStorage.locale) {
-			const languages = await getLanguages();
-			const browserLanguages = navigator.languages
-				? navigator.languages
-				: [navigator.language || navigator.userLanguage];
-			const lang = backendConfig.default_locale
-				? backendConfig.default_locale
-				: bestMatchingLanguage(languages, browserLanguages, 'en-US');
-			$i18n.changeLanguage(lang);
+		if ($locale) {
+			// 	const languages = await getLanguages();
+			// 	const browserLanguages = navigator.languages
+			// 		? navigator.languages
+			// 		: [navigator.language || navigator.userLanguage];
+			// 	const lang = backendConfig.default_locale
+			// 		? backendConfig.default_locale
+			// 		: bestMatchingLanguage(languages, browserLanguages, 'en-US');
+			$i18n.changeLanguage('fr-FR');
+		} else {
+			// Load language from user preferences
+			$i18n.changeLanguage($locale);
 		}
 
 		if (backendConfig) {

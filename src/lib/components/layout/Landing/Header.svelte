@@ -1,12 +1,10 @@
 <script lang="ts">
-	// Import translation utility
+	// Import translation utility and global stores
 	import i18n from '$lib/i18n';
+	import { showContactUs } from '$lib/stores';
 
 	// Import components
 	import LanguageSelector from '../LanguageSelector.svelte';
-
-	/** Controls contact form visibility */
-	export let showContactUs: boolean;
 </script>
 
 <header
@@ -35,8 +33,8 @@
 		class="w-auto h-8 px-3 rounded-full border border-slate-300 bg-transparent
             text-sm text-slate-500 transition-all hover:bg-white hover:text-slate-600
             md:h-12 md:px-8 xl:h-14 xl:px-12 xl:text-base"
-		on:click={() => (showContactUs = !showContactUs)}
-		aria-expanded={showContactUs}
+		on:click={() => ($showContactUs = !$showContactUs)}
+		aria-expanded={$showContactUs}
 		aria-controls="contact-form"
 		aria-label={$i18n.t('Contact us')}
 	>

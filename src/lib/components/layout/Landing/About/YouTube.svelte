@@ -1,5 +1,5 @@
 <div
-	class="px-8 md:p-12 xl:p-24 flex justify-center bg-gradient-to-r from-blue-50 from-40% via-white to-60% to-red-50"
+	class="px-8 md:p-12 xl:p-24 flex justify-center"
 >
 	<iframe
 		width="960"

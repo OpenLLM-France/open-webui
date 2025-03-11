@@ -69,6 +69,7 @@ export const showSettings = writable(false);
 export const showArchivedChats = writable(false);
 export const showChangelog = writable(false);
 export const showNotice = writable<boolean>(true); // Should the notice be displayed
+export const showContactUs = writable<boolean>(false); // Should the contact us form be displayed
 
 export const showControls = writable(false);
 export const showOverview = writable(false);

@@ -9,23 +9,12 @@
 	import { ldapUserSignIn, getSessionUser, userSignIn, userSignUp } from '$lib/apis/auths';
 
 	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
-	import { WEBUI_NAME, config, user, socket, showNotice } from '$lib/stores';
+	import { WEBUI_NAME, config, user, socket } from '$lib/stores';
 
 	import { generateInitialsImage, canvasPixelTest } from '$lib/utils';
 
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import OnBoarding from '$lib/components/OnBoarding.svelte';
-
-	import EyeInBox from '$lib/components/icons/EyeInBox.svelte';
-	import StateGraph from '$lib/components/icons/StateGraph.svelte';
-	import TouchWindow from '$lib/components/icons/TouchWindow.svelte';
-	import EuLogo from '$lib/components/icons/EULogo.svelte';
-	import Speedometer from '$lib/components/icons/Speedometer.svelte';
-	import PlanetLeaf from '$lib/components/icons/PlanetLeaf.svelte';
-
-	import Notice from '$lib/components/layout/Overlay/Notice.svelte';
-	import ContactUs from '$lib/components/layout/Overlay/ContactUs.svelte';
-	import LanguageSelector from '$lib/components/layout/LanguageSelector.svelte';
 
 	import {
 		Timeline,
@@ -36,14 +25,12 @@
 		TimelineContent,
 		TimelineOppositeContent
 	} from 'svelte-vertical-timeline';
-	import Header from '$lib/components/layout/Landing/Header.svelte';
 	import About from '$lib/components/layout/Landing/About.svelte';
+	import Details from '$lib/components/layout/Landing/Details.svelte';
 
 	const i18n = getContext('i18n');
 
 	let loaded = false;
-
-	let showContactUs = false;
 
 	let mode = $config?.features.enable_ldap ? 'ldap' : 'signin';
 
@@ -155,184 +142,10 @@
 	});
 </script>
 
-<svelte:head>
-	<title>
-		{`${$WEBUI_NAME}`}
-	</title>
-</svelte:head>
-
-<!-- Notice Popup -->
-{#if $showNotice}
-	<Notice />
-{:else}
-	<button
-		class="fixed bottom-3 right-4 flex items-center justify-center h-6 aspect-square rounded-full border text-xs bg-white/80 hover:bg-gray-100/80 transition-all"
-		on:click={() => {
-			$showNotice = true;
-		}}
-	>
-		?
-	</button>
-{/if}
-
-<!-- Contact Us Form Popup -->
-{#if showContactUs}
-	<ContactUs bind:show={showContactUs} isLightMode={true} />
-{/if}
-
-<Header bind:showContactUs />
-
 <!-- Page -->
 <div class="h-screen overflow-y-scroll text-gray-700">
 	<About />
-	<div class="px-8 md:px-12 xl:px-24 2xl:px-48 py-12 xl:py-16 2xl:py-24">
-		<div class="text-2xl xl:text-3xl mb-8 xl:mb-16">
-			{$i18n.t('What makes {{WEBUI_NAME}} truly Open Source ?', { WEBUI_NAME: $WEBUI_NAME })}
-		</div>
-		<div class="grid gap-12 md:grid-cols-2 lg:grid-cols-3 xl:gap-16 2xl:gap-24">
-			<div class="flex flex-col space-y-4 2xl:space-y-8">
-				<EyeInBox className="size-10" />
-				<span class="text-xl font-medium h-14 xl:h-16 xl:text-2xl">
-					{$i18n.t('Transparent Data')}
-				</span>
-				<span>
-					{$i18n.t(
-						'All training datasets are openly available and licensed for public use. We ensure transparency at every stage, from collection to curation.'
-					)}
-				</span>
-			</div>
-			<div class="flex flex-col space-y-4 2xl:space-y-8">
-				<StateGraph className="size-10" />
-				<span class="text-xl font-medium h-14 xl:h-16 xl:text-2xl">
-					{$i18n.t('Open Algorithms')}
-				</span>
-				<span>
-					{$i18n.t(
-						'Our training methodologies, fine-tuning processes, and "secret sauce" are thoroughly documented and openly accessible for anyone to explore, use, and improve.'
-					)}
-				</span>
-			</div>
-			<div class="flex flex-col space-y-4 2xl:space-y-8">
-				<TouchWindow className="size-8 mb-2" />
-				<span class="text-xl font-medium h-14 flex items-end xl:h-16 xl:text-2xl">
-					{$i18n.t('A Completely Free-Access Production Line')}
-				</span>
-				<span>
-					{$i18n.t(
-						"{{WEBUI_NAME}}'s weights, checkpoints, and source code are available under the Apache 2.0 license. This permissive, unrestricted license allows anyone, anywhere in the world, to use, adapt, and deploy the model for any purpose, ensuring true global accessibility and innovation.",
-						{ WEBUI_NAME: $WEBUI_NAME }
-					)}
-				</span>
-			</div>
-		</div>
-	</div>
-	<div class="px-8 md:px-12 xl:px-24 2xl:px-48 py-12 xl:py-24 bg-gray-50">
-		<div class="grid 2xl:grid-cols-2 items-center mb-8 xl:mb-16">
-			<span class="text-2xl xl:text-3xl">
-				{$i18n.t('Designed for sovereignty and sustainability')}
-			</span>
-			<span class="text-sm">
-				{$i18n.t(
-					'{{WEBUI_NAME}} was built to address the unique challenges of developing ethical, efficient, and accessible AI.',
-					{ WEBUI_NAME: $WEBUI_NAME }
-				)}
-			</span>
-		</div>
-		<div class="grid gap-6 md:grid-cols-2 md:gap-12 lg:grid-cols-3">
-			<div class="flex flex-col space-y-4 xl:space-y-8 bg-white rounded p-8">
-				<EuLogo className="size-16 p-1 border-2 border-gray-700 rounded-full" />
-				<span class="text-2xl 2xl:text-3xl font-medium">{$i18n.t('European Sovereignty')}</span>
-				<span>
-					{$i18n.t(
-						'{{WEBUI_NAME}} embodies a commitment to European values by respecting cultural diversity, promoting ethical AI development and ensuring compliance with the AI Act.',
-						{ WEBUI_NAME: $WEBUI_NAME }
-					)}
-				</span>
-			</div>
-			<div class="flex flex-col space-y-4 xl:space-y-8 bg-white rounded p-8">
-				<Speedometer className="size-16" />
-				<span class="text-2xl 2xl:text-3xl font-medium">{$i18n.t('Compact and Efficient')}</span>
-				<span>
-					{$i18n.t(
-						'Optimized for low-resource environments, {{WEBUI_NAME}}\'s architecture enables deployment on "GPU poor" infrastructures and even on mobile devices.',
-						{ WEBUI_NAME: $WEBUI_NAME }
-					)}
-				</span>
-			</div>
-			<div class="flex flex-col space-y-4 xl:space-y-8 bg-white rounded p-8">
-				<PlanetLeaf className="size-16" />
-				<span class="text-2xl 2xl:text-3xl font-medium">{$i18n.t('Eco-Responsibility')}</span>
-				<span>
-					{$i18n.t(
-						'By focusing on quality over quantity in training data, we ensure a lighter environmental footprint without compromising performance.'
-					)}
-				</span>
-			</div>
-		</div>
-	</div>
-	<div class="px-8 md:px-12 xl:px-24 2xl:px-48 my-12 xl:my-24">
-		<div class="text-2xl xl:text-3xl mb-8 xl:mb-16">
-			{$i18n.t('{{WEBUI_NAME}} in figures', { WEBUI_NAME: $WEBUI_NAME })}
-		</div>
-		<div
-			class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8 xl:gap-16 2xl:gap-24"
-		>
-			<div class="flex flex-col space-y-3 xl:space-y-6">
-				<span class="text-xl xl:text-3xl h-14 xl:h-20 flex items-end">
-					{$i18n.t('7 billion parameters')}
-				</span>
-				<div class="w-full h-px bg-black"></div>
-				<span class="text-sm">
-					{$i18n.t(
-						'Model size: 7 billion parameters - compact and optimized for performance across diverse applications. In 2025, we will build a more compact model size of {{WEBUI_NAME}} (<3B).',
-						{ WEBUI_NAME: $WEBUI_NAME }
-					)}
-				</span>
-			</div>
-			<div class="flex flex-col space-y-3 xl:space-y-6">
-				<span class="text-xl xl:text-3xl h-14 xl:h-20 flex items-end"
-					>{$i18n.t('3.1 trillion tokens')}</span
-				>
-				<div class="w-full h-px bg-black"></div>
-				<span class="text-sm">
-					{$i18n.t(
-						'Training Dataset: 3.1 trillion tokens, carefully curated to balance quality and diversity, including French, English, German, Spanish, Italian, and code.'
-					)}
-				</span>
-			</div>
-			<div class="flex flex-col space-y-3 xl:space-y-6">
-				<span class="text-xl xl:text-3xl h-14 xl:h-20 flex items-end">
-					{$i18n.t('600k GPU Hours')}
-				</span>
-				<div class="w-full h-px bg-black"></div>
-				<span class="text-sm">
-					{$i18n.t(
-						'Training Hours: Over 600,000 GPU hours on the Jean Zay supercomputer, utilizing 512 NVIDIA H100 GPUs in parallel.'
-					)}
-				</span>
-			</div>
-			<div class="flex flex-col space-y-3 xl:space-y-6">
-				<span class="text-xl xl:text-3xl h-14 xl:h-20 flex items-end">
-					{$i18n.t('Languages supported')}
-				</span>
-				<div class="w-full h-px bg-black"></div>
-				<span class="text-sm">
-					{$i18n.t(
-						'Multilingual focus, with a primary emphasis on French and main european languages, ensuring cultural and linguistic representation.'
-					)}
-				</span>
-			</div>
-			<div class="flex flex-col space-y-3 xl:space-y-6">
-				<span class="text-xl xl:text-3xl h-14 2xl:h-20 flex items-end">2023 - 2025</span>
-				<div class="w-full h-px bg-black"></div>
-				<span class="text-sm">
-					{$i18n.t(
-						"Development Timeline : Training initiated in late 2023, culminating with the model's release in January 2025."
-					)}
-				</span>
-			</div>
-		</div>
-	</div>
+	<Details />
 	<!-- Timeline -->
 	<div class="max-xl:px-8 py-12 xl:py-24 bg-gray-50 flex flex-col items-center text-center">
 		<div class="text-3xl mb-8">

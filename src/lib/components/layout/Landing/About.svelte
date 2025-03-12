@@ -12,7 +12,7 @@
 <!-- About section with gradient background and responsive grid layout -->
 <section
 	class="p-8 md:p-12 xl:p-24 2xl:px-48 space-y-4
-		bg-gradient-to-r from-blue-50 from-40% via-white to-60% to-red-50"
+		bg-gradient-to-br bg-fixed from-blue-50 from-40% via-white to-60% to-red-50"
 	aria-labelledby="about-section"
 >
 	<div class="grid xl:grid-cols-2">
@@ -27,7 +27,7 @@
 			</h1>
 
 			<!-- Subtitle/tagline -->
-			<h2 class="pb-2 text-lg text-gray-500 max-xl:text-center xl:text-xl 2xl:text-2xl">
+			<h2 class="pb-2 text-lg text-gray-600 max-xl:text-center xl:text-xl 2xl:text-2xl">
 				{$i18n.t('Beyond openness, we pioneer transparency and trust.')}
 			</h2>
 

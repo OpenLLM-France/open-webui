@@ -10,7 +10,7 @@
 <header
 	aria-label="Site header"
 	class="fixed z-30 w-full h-20 px-8 flex items-center justify-between
-        border-b-[2px] border-gray-100/50 bg-white/70 backdrop-blur-md
+        bg-transparent backdrop-blur-md
         md:px-12 xl:px-24 2xl:px-48"
 >
 	<!-- Logo and language selector -->
@@ -30,8 +30,8 @@
 
 	<!-- Contact button -->
 	<button
-		class="w-auto h-8 px-3 rounded-full border border-slate-300 bg-transparent
-            text-sm text-slate-500 transition-all hover:bg-white hover:text-slate-600
+		class="w-auto h-8 px-3 rounded-full border border-slate-300/50 bg-white/30
+            text-sm text-slate-800 transition-all hover:bg-white/50 hover:text-slate-900
             md:h-12 md:px-8 xl:h-14 xl:px-12 xl:text-base"
 		on:click={() => ($showContactUs = !$showContactUs)}
 		aria-expanded={$showContactUs}

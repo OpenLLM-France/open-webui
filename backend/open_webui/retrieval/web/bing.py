@@ -63,7 +63,7 @@ def main():
     parser.add_argument(
         "--locale",
         type=str,
-        default="en-US",
+        default="en-GB",
         help="The locale to use for the search, maps to market in api",
     )
 

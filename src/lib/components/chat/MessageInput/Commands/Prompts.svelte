@@ -91,7 +91,7 @@
 		}
 
 		if (command.content.includes('{{USER_LANGUAGE}}')) {
-			const language = localStorage.getItem('locale') || 'en-US';
+			const language = localStorage.getItem('locale') || 'en-GB';
 			text = text.replaceAll('{{USER_LANGUAGE}}', language);
 		}
 

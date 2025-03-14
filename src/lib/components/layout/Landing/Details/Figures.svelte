@@ -11,11 +11,7 @@
 	<div
 		class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8 xl:gap-16 2xl:gap-18"
 	>
-		<div
-			class="flex flex-col space-y-3
-				bg-fixed bg-gradient-to-br from-blue-50 to-red-50 shadow-md p-4
-				xl:space-y-6"
-		>
+		<div class="shiny-card space-y-3 xl:space-y-6">
 			<span
 				class="text-xl font-medium text-center self-center xl:text-2xl h-14 xl:h-20 flex items-center"
 			>
@@ -29,11 +25,7 @@
 				)}
 			</span>
 		</div>
-		<div
-			class="flex flex-col space-y-3
-				bg-fixed bg-gradient-to-br from-blue-50 to-red-50 shadow-md p-4
-				xl:space-y-6"
-		>
+		<div class="shiny-card space-y-3 xl:space-y-6">
 			<span
 				class="text-xl font-medium text-center self-center xl:text-2xl h-14 xl:h-20 flex items-center"
 				>{$i18n.t('3.1 trillion tokens')}</span
@@ -45,11 +37,7 @@
 				)}
 			</span>
 		</div>
-		<div
-			class="flex flex-col space-y-3
-				bg-fixed bg-gradient-to-br from-blue-50 to-red-50 shadow-md p-4
-				xl:space-y-6"
-		>
+		<div class="shiny-card space-y-3 xl:space-y-6">
 			<span
 				class="text-xl font-medium text-center self-center xl:text-2xl h-14 xl:h-20 flex items-center"
 			>
@@ -62,11 +50,7 @@
 				)}
 			</span>
 		</div>
-		<div
-			class="flex flex-col space-y-3
-				bg-fixed bg-gradient-to-br from-blue-50 to-red-50 shadow-md p-4
-				xl:space-y-6"
-		>
+		<div class="shiny-card space-y-3 xl:space-y-6">
 			<span
 				class="text-xl font-medium text-center self-center xl:text-2xl h-14 xl:h-20 flex items-center"
 			>
@@ -79,11 +63,7 @@
 				)}
 			</span>
 		</div>
-		<div
-			class="flex flex-col space-y-3
-				bg-fixed bg-gradient-to-br from-blue-50 to-red-50 shadow-md p-4
-				xl:space-y-6"
-		>
+		<div class="shiny-card space-y-3 xl:space-y-6">
 			<span
 				class="text-xl font-medium text-center self-center xl:text-2xl h-14 2xl:h-20 flex items-center"
 			>

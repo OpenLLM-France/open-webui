@@ -23,8 +23,10 @@
 			)}
 		</span>
 	</div>
-	<div class="grid gap-6 md:grid-cols-2 md:gap-12 lg:grid-cols-3 xl:gap-20">
-		<div class="flex flex-col space-y-4 xl:space-y-8 bg-transparent rounded">
+	<div class="grid gap-6 md:grid-cols-2 md:gap-12 lg:grid-cols-3 xl:gap-20 -m-8">
+		<div
+			class="p-8 flex flex-col space-y-4 xl:space-y-8 bg-transparent rounded transition-all hover:scale-[102.5%] hover:shadow-md"
+		>
 			<EuLogo className="size-16 p-1 border-2 border-gray-700 rounded-full" />
 			<span class="text-2xl 2xl:text-3xl font-medium">{$i18n.t('European Sovereignty')}</span>
 			<span class="text-justify">
@@ -34,7 +36,9 @@
 				)}
 			</span>
 		</div>
-		<div class="flex flex-col space-y-4 xl:space-y-8 bg-transparent rounded">
+		<div
+			class="p-8 flex flex-col space-y-4 xl:space-y-8 bg-transparent rounded transition-all hover:scale-[102.5%] hover:shadow-md"
+		>
 			<Speedometer className="size-16" />
 			<span class="text-2xl 2xl:text-3xl font-medium">{$i18n.t('Compact and Efficient')}</span>
 			<span class="text-justify">
@@ -44,7 +48,9 @@
 				)}
 			</span>
 		</div>
-		<div class="flex flex-col space-y-4 xl:space-y-8 bg-transparent rounded">
+		<div
+			class="p-8 flex flex-col space-y-4 xl:space-y-8 bg-transparent rounded transition-all hover:scale-[102.5%] hover:shadow-md"
+		>
 			<PlanetLeaf className="size-16" />
 			<span class="text-2xl 2xl:text-3xl font-medium">{$i18n.t('Eco-Responsibility')}</span>
 			<span class="text-justify">

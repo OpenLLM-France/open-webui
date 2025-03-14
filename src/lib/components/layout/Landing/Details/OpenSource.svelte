@@ -14,11 +14,7 @@
 		{$i18n.t('What makes {{WEBUI_NAME}} truly Open Source ?', { WEBUI_NAME: $WEBUI_NAME })}
 	</div>
 	<div class="grid gap-12 md:grid-cols-2 lg:grid-cols-3 xl:gap-16 2xl:gap-24">
-		<div
-			class="flex flex-col space-y-4
-			 	bg-fixed bg-gradient-to-br from-blue-50 to-red-50 shadow-md p-8
-			 	2xl:space-y-6"
-		>
+		<div class="shiny-card p-8">
 			<EyeInBox className="size-10" />
 			<span class="text-xl font-medium xl:text-2xl">
 				{$i18n.t('Transparent Data')}
@@ -29,11 +25,7 @@
 				)}
 			</span>
 		</div>
-		<div
-			class="flex flex-col space-y-4
-			 	bg-fixed bg-gradient-to-br from-blue-50 to-red-50 shadow-md p-8
-			 	2xl:space-y-6"
-		>
+		<div class="shiny-card p-8">
 			<StateGraph className="size-10" />
 			<span class="text-xl font-medium xl:text-2xl">
 				{$i18n.t('Open Algorithms')}
@@ -44,11 +36,7 @@
 				)}
 			</span>
 		</div>
-		<div
-			class="flex flex-col space-y-4
-			 	bg-fixed bg-gradient-to-br from-blue-50 to-red-50 shadow-md p-8
-			 	2xl:space-y-6"
-		>
+		<div class="shiny-card p-8">
 			<TouchWindow className="size-10 p-[0.125rem]" />
 			<span class="text-xl font-medium xl:text-2xl">
 				Licence libre

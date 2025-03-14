@@ -6,6 +6,7 @@
 	import Header from '$lib/components/layout/Landing/Header.svelte';
 	import Notice from '$lib/components/layout/Overlay/Notice.svelte';
 	import ContactUs from '$lib/components/layout/Overlay/ContactUs.svelte';
+	import Footer from '$lib/components/layout/Landing/Footer.svelte';
 </script>
 
 <svelte:head>
@@ -35,4 +36,9 @@
 
 <Header />
 
-<slot />
+<!-- Page -->
+<div class="h-screen overflow-y-scroll text-gray-700">
+	<slot />
+
+	<Footer />
+</div>

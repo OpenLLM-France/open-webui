@@ -464,7 +464,7 @@
 		// Initialize i18n even if we didn't get a backend config,
 		// so `/error` can show something that's not `undefined`.
 
-		initI18n('fr-FR');
+		initI18n('en-GB');
 		if ($locale) {
 			// 	const languages = await getLanguages();
 			// 	const browserLanguages = navigator.languages

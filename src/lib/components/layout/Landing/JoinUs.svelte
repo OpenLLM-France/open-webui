@@ -17,7 +17,10 @@
 		</span>
 	</div>
 	<div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-		<div class="shiny-card">
+		<a
+			class="shiny-card hover:scale-[102.5%] transition-all"
+			href="https://github.com/OpenLLM-France"
+		>
 			<div class="flex justify-center items-center xl:h-48 2xl:h-64 xl:p-4">
 				<img
 					crossorigin="anonymous"
@@ -26,7 +29,9 @@
 					alt="GitHub logo"
 				/>
 			</div>
-			<span class="px-4 pb-2 text-xl lg:text-center xl:text-left 2xl:text-2xl xl:min-h-16 2xl:min-h-18">
+			<span
+				class="px-4 pb-2 text-xl lg:text-center xl:text-left 2xl:text-2xl xl:min-h-16 2xl:min-h-18"
+			>
 				{$i18n.t('Collaborate on GitHub')}
 			</span>
 			<span class="px-4 text-sm md:h-10 lg:text-center xl:text-left xl:h-16 2xl:h-32">
@@ -34,12 +39,15 @@
 			</span>
 			<a
 				href="https://github.com/OpenLLM-France"
-				class="my-6 py-3 px-12 self-center rounded-full border border-black bg-white hover:bg-gray-50 transition-all"
+				class="my-6 py-3 px-12 self-center rounded-full bg-gradient-to-br from-blue-100 to-red-100 hover:from-blue-200 hover:to-red-200 hover:text-gray-800 -all"
 			>
 				{$i18n.t('Contribute')}
 			</a>
-		</div>
-		<div class="shiny-card">
+		</a>
+		<a
+			class="shiny-card hover:scale-[102.5%] transition-all"
+			href="https://huggingface.co/OpenLLM-France"
+		>
 			<div class="flex justify-center items-center xl:h-48 2xl:h-64 xl:p-4">
 				<img
 					crossorigin="anonymous"
@@ -48,7 +56,9 @@
 					alt="Lucie illustration"
 				/>
 			</div>
-			<span class="px-4 pb-2 text-xl lg:text-center xl:text-left 2xl:text-2xl xl:min-h-16 2xl:min-h-18">
+			<span
+				class="px-4 pb-2 text-xl lg:text-center xl:text-left 2xl:text-2xl xl:min-h-16 2xl:min-h-18"
+			>
 				{$i18n.t('Experiment on Hugging Face')}
 			</span>
 			<span class="px-4 text-sm lg:text-center xl:text-left xl:h-16 2xl:h-32">
@@ -58,12 +68,12 @@
 			</span>
 			<a
 				href="https://huggingface.co/OpenLLM-France"
-				class="my-6 py-3 px-12 self-center rounded-full border border-black bg-white hover:bg-gray-50 transition-all"
+				class="my-6 py-3 px-12 self-center rounded-full bg-gradient-to-br from-blue-100 to-red-100 hover:from-blue-200 hover:to-red-200 hover:text-gray-800 -all"
 			>
 				{$i18n.t('Experiment')}
 			</a>
-		</div>
-		<div class="shiny-card">
+		</a>
+		<a class="shiny-card hover:scale-[102.5%] transition-all" href="https://www.openllm-france.fr/">
 			<div class="flex justify-center items-center xl:h-48 2xl:h-64 xl:p-4">
 				<img
 					crossorigin="anonymous"
@@ -72,7 +82,9 @@
 					alt="OpenLLM France Logo"
 				/>
 			</div>
-			<span class="px-4 pb-2 text-xl lg:text-center xl:text-left 2xl:text-2xl xl:min-h-16 2xl:min-h-18">
+			<span
+				class="px-4 pb-2 text-xl lg:text-center xl:text-left 2xl:text-2xl xl:min-h-16 2xl:min-h-18"
+			>
 				{$i18n.t('Be Part of OpenLLM France')}
 			</span>
 			<span class="px-4 text-sm lg:text-center xl:text-left xl:h-16 2xl:h-32">
@@ -80,12 +92,15 @@
 			</span>
 			<a
 				href="https://www.openllm-france.fr/"
-				class="my-6 py-3 px-12 self-center rounded-full border border-black bg-white hover:bg-gray-50 transition-all"
+				class="my-6 py-3 px-12 self-center rounded-full bg-gradient-to-br from-blue-100 to-red-100 hover:from-blue-200 hover:to-red-200 hover:text-gray-800 -all"
 			>
 				{$i18n.t('Join us')}
 			</a>
-		</div>
-		<div class="shiny-card">
+		</a>
+		<a
+			class="shiny-card hover:scale-[102.5%] transition-all"
+			href="https://github.com/OpenLLM-Europe/European-OpenLLM-Projects"
+		>
 			<div class="flex justify-center items-center xl:h-48 2xl:h-64 xl:p-4">
 				<img
 					crossorigin="anonymous"
@@ -94,7 +109,9 @@
 					alt="OpenLLM Europe logo"
 				/>
 			</div>
-			<span class="px-4 pb-2 text-xl lg:text-center xl:text-left 2xl:text-2xl xl:min-h-16 2xl:min-h-18">
+			<span
+				class="px-4 pb-2 text-xl lg:text-center xl:text-left 2xl:text-2xl xl:min-h-16 2xl:min-h-18"
+			>
 				{$i18n.t('Other European Initiatives')}
 			</span>
 			<span class="px-4 text-sm lg:text-center xl:text-left xl:h-16 2xl:h-32">
@@ -102,10 +119,10 @@
 			</span>
 			<a
 				href="https://github.com/OpenLLM-Europe/European-OpenLLM-Projects"
-				class="my-6 py-3 px-12 self-center rounded-full border border-black bg-white hover:bg-gray-50 transition-all"
+				class="my-6 py-3 px-12 self-center rounded-full bg-gradient-to-br from-blue-100 to-red-100 hover:from-blue-200 hover:to-red-200 hover:text-gray-800 -all"
 			>
 				{$i18n.t('Explore')}
 			</a>
-		</div>
+		</a>
 	</div>
 </div>

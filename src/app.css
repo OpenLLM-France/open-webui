@@ -386,6 +386,6 @@ input[type='number'] {
 
 @layer components {
 	.shiny-card {
-		@apply p-4 flex flex-col space-y-4 rounded shadow-md bg-fixed bg-gradient-to-br from-blue-50 to-red-50 hover:scale-[102.5%] transition-all 2xl:space-y-6;
+		@apply p-4 flex flex-col space-y-4 rounded shadow-md bg-fixed bg-gradient-to-br from-blue-50 to-red-50 2xl:space-y-6;
 	}
 }

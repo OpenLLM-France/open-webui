@@ -17,7 +17,7 @@
 		<div class="shiny-card p-8">
 			<EyeInBox className="size-10" />
 			<span class="text-xl font-medium xl:text-2xl">
-				{$i18n.t('Transparent Data')}
+				{$i18n.t('Transparent data')}
 			</span>
 			<span class="text-justify">
 				{$i18n.t(
@@ -28,7 +28,7 @@
 		<div class="shiny-card p-8">
 			<StateGraph className="size-10" />
 			<span class="text-xl font-medium xl:text-2xl">
-				{$i18n.t('Open Algorithms')}
+				{$i18n.t('Open algorithms')}
 			</span>
 			<span class="text-justify">
 				{$i18n.t(
@@ -39,7 +39,7 @@
 		<div class="shiny-card p-8">
 			<TouchWindow className="size-10 p-[0.125rem]" />
 			<span class="text-xl font-medium xl:text-2xl">
-				Licence libre
+				{$i18n.t('Free license')}
 				<!-- {$i18n.t('A Completely Free-Access Production Line')} -->
 			</span>
 			<span class="text-justify">

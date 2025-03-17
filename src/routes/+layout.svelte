@@ -473,10 +473,12 @@
 			// 	const lang = backendConfig.default_locale
 			// 		? backendConfig.default_locale
 			// 		: bestMatchingLanguage(languages, browserLanguages, 'en-GB');
-			$i18n.changeLanguage('fr-FR');
-		} else {
+			
 			// Load language from user preferences
 			$i18n.changeLanguage($locale);
+		} else {
+			// Set language to french by default
+			$i18n.changeLanguage('fr-FR');
 		}
 
 		if (backendConfig) {
